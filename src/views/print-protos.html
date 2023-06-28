@@ -1,0 +1,511 @@
+<html>
+  <head>
+    <meta content="text/html;charset=utf-8" http-equiv="Content-Type" />
+    <meta content="utf-8" http-equiv="encoding" />
+
+    <script
+      src="https://code.jquery.com/jquery-3.4.1.min.js"
+      integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+      crossorigin="anonymous"
+    ></script>
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+    />
+    <script
+      type="text/javascript"
+      src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"
+    ></script>
+    <script src="https://kit.fontawesome.com/13b744953d.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+
+    <script src="json-viewer/jquery.json-viewer.js"></script>
+    <link
+      href="json-viewer/jquery.json-viewer.css"
+      type="text/css"
+      rel="stylesheet"
+    />
+  </head>
+
+  <body class="p-2">
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col">
+          <div class="card">
+            <h4 class="card-header">
+              <div class="float-left align-middle">Proto's</div>
+              <div class="float-right align-middle">
+                <i class="fas fa-play" id="play-button"></i>
+                <i class="fas fa-pause" id="pause-button"></i>
+                <i class="fas fa-trash" id="clear-button"></i>
+              </div>
+            </h4>
+            <div class="card-body">
+              <div class="row">
+                <div class="col-md-12">Filters</div>
+                <div class="col-md-12">
+                  <label for="instance-filter">Instance</label>
+                  <input
+                    type="text"
+                    id="instance-filter"
+                    placeholder="Instance name"
+                  />
+                  <label for="instance-filter-dropdown">Found Instances:</label>
+                  <select id="instance-filter-dropdown">
+                    <option value=""></option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="row">
+                    <div class="col-md-6">
+                      <div>
+                        <label>Blacklist ids</label>
+                      </div>
+                      <div>
+                        <input
+                          type="text"
+                          id="blacklist-ids-incoming"
+                          value=""
+                          style="width: 100%"
+                        />
+                      </div>
+                    </div>
+                    <div class="col-md-6">
+                      <div>
+                        <label>Whitelist ids</label>
+                      </div>
+                      <div>
+                        <input
+                          type="text"
+                          id="whitelist-ids-incoming"
+                          value=""
+                          style="width: 100%"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="row">
+                    <div class="col-md-6">
+                      <div>
+                        <label>Blacklist ids</label>
+                      </div>
+                      <div>
+                        <input
+                          type="text"
+                          id="blacklist-ids-outgoing"
+                          value=""
+                          style="width: 100%"
+                        />
+                      </div>
+                    </div>
+                    <div class="col-md-6">
+                      <div>
+                        <label>Whitelist ids</label>
+                      </div>
+                      <div>
+                        <input
+                          type="text"
+                          id="whitelist-ids-outgoing"
+                          value=""
+                          style="width: 100%"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-md-6">
+                  <div style="width: 100%">Incoming</div>
+                  <table
+                    id="incoming"
+                    class="table table-striped table-hover table-bordered rounded-lg"
+                    style="width: 100%"
+                  >
+                    <thead>
+                      <tr>
+                        <th>instance</th>
+                        <th>id</th>
+                        <th>name</th>
+                        <th>data</th>
+                      </tr>
+                    </thead>
+                    <tbody></tbody>
+                  </table>
+                </div>
+                <div class="col-md-6">
+                  <div style="width: 100%">Outgoing</div>
+                  <table
+                    id="outgoing"
+                    class="table table-striped table-hover table-bordered rounded-lg"
+                    style="width: 100%"
+                  >
+                    <thead>
+                      <tr>
+                        <th>instance</th>
+                        <th>id</th>
+                        <th>name</th>
+                        <th>data</th>
+                      </tr>
+                    </thead>
+                    <tbody></tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="modal-detail" class="modal" tabindex="-1" role="dialog">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">
+              Method id: <span class="method-id"></span>
+            </h5>
+            <button
+              type="button"
+              class="close"
+              data-dismiss="modal"
+              aria-label="Close"
+            >
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <p>Method name: <span class="method-name"></span></p>
+            <p>Data:</p>
+            <pre class="method-data"></pre>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-dismiss="modal"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script>
+      var STATE = 0;
+      setStateOnButtons();
+
+      var incoming = io.connect("/incoming"),
+        outgoing = io.connect("/outgoing");
+
+      let foundInstances = [];
+      let instanceFilter = "";
+      let incomingBlacklistIds = [];
+      let incomingWhitelistIds = [];
+      let outgoingBlacklistIds = [];
+      let outgoingWhitelistIds = [];
+
+      let numberOfRowsIncoming = 0;
+      incoming.on("protos", function (data) {
+        if (foundInstances.indexOf(data.identifier) === -1) {
+          foundInstances.push(data.identifier);
+          appendFoundName(data.identifier);
+        }
+
+        if (STATE !== 1) {
+          return;
+        }
+
+        if (instanceFilter !== "" && data.identifier !== instanceFilter) {
+          return;
+        }
+
+        if (incomingWhitelistIds.length > 0) {
+          if (incomingWhitelistIds.indexOf(data.methodId) === -1) {
+            return;
+          }
+        } else if (incomingBlacklistIds.length > 0) {
+          if (incomingBlacklistIds.indexOf(data.methodId) !== -1) {
+            return;
+          }
+        }
+
+        if (typeof data.error !== "undefined") {
+          console.error(data.error);
+        } else {
+          const tr = $(
+            `<tr><td class="instance-cell">${ 
+              data.identifier
+            }</td><td class="method-id-cell">${
+              data.methodId
+            }</td><td class="method-name-cell">${
+              data.methodName
+            }</td><td>${objectToReadable(data.data)}</td></tr>`
+          );
+          tr.data("fulldata", data.data);
+
+          $("#incoming tbody").prepend(tr);
+
+          numberOfRowsIncoming++;
+          if (numberOfRowsIncoming > 1000) {
+            $("#incoming tbody tr:last").remove();
+            numberOfRowsIncoming--;
+          }
+        }
+      });
+
+      let numberOfRowsOutgoing = 0;
+      outgoing.on("protos", function (data) {
+        if (foundInstances.indexOf(data.identifier) === -1) {
+          foundInstances.push(data.identifier);
+          appendFoundName(data.identifier);
+        }
+
+        if (STATE !== 1) {
+          return;
+        }
+
+        if (outgoingWhitelistIds.length > 0) {
+          if (outgoingWhitelistIds.indexOf(data.methodId) === -1) {
+            return;
+          }
+        } else if (outgoingBlacklistIds.length > 0) {
+          if (outgoingBlacklistIds.indexOf(data.methodId) !== -1) {
+            return;
+          }
+        }
+
+        if (instanceFilter !== "" && data.identifier !== instanceFilter) {
+          return;
+        }
+
+        if (typeof data.error !== "undefined") {
+          console.error(data.error);
+        } else {
+          const tr = $(
+            `<tr data-fulldata="${JSON.stringify(
+              data.data
+            )}"><td class="instance-cell">${ 
+              data.identifier
+            }</td><td class="method-id-cell">${
+              data.methodId
+            }</td><td class="method-name-cell">${
+              data.methodName
+            }</td><td class="data-cell">${objectToReadable(
+              data.data
+            )}</td></tr>`
+          );
+          tr.data("fulldata", data.data);
+          $("#outgoing tbody").prepend(tr);
+
+          numberOfRowsOutgoing++;
+          if (numberOfRowsOutgoing > 1000) {
+            $("#outgoing tbody tr:last").remove();
+            numberOfRowsOutgoing--;
+          }
+        }
+      });
+
+      $("#incoming tbody,#outgoing tbody").on("click", "tr", function () {
+        let methodId = $(this).find(".method-id-cell").html();
+        let methodName = $(this).find(".method-name-cell").html();
+        let data = $(this).data("fulldata");
+
+        $("#modal-detail").find(".method-id").html(methodId);
+        $("#modal-detail").find(".method-name").html(methodName);
+        $("#modal-detail").find(".method-data").jsonViewer(data);
+        $("#modal-detail").modal();
+      });
+
+      $("#play-button").click(function () {
+        STATE = 1;
+        setStateOnButtons();
+        storeSettings();
+      });
+
+      $("#pause-button").click(function () {
+        STATE = 0;
+        setStateOnButtons();
+        storeSettings();
+      });
+
+      $("#clear-button").click(function () {
+        $("#incoming tbody tr,#outgoing tbody tr").remove();
+        numberOfRowsIncoming = 0;
+        numberOfRowsOutgoing = 0;
+      });
+
+      function setStateOnButtons() {
+        let id = "";
+        let idDisabled = "";
+        switch (STATE) {
+          case 0:
+            id = "play-button";
+            idDisabled = "pause-button";
+            break;
+          case 1:
+            id = "pause-button";
+            idDisabled = "play-button";
+            break;
+        }
+
+        $("#" + id).css("color", "#000000");
+        $("#" + idDisabled).css("color", "#888888");
+      }
+
+      function appendFoundName(name) {
+        $("#instance-filter-dropdown").append(`<option value="${name}">
+           ${name}
+        </option>`);
+      }
+
+      function objectToReadable(object) {
+        let dataStrings = [];
+        let numberOfRows = 0;
+        for (let key in object) {
+          if (numberOfRows >= 10) {
+            dataStrings.push("...");
+            break;
+          }
+
+          let value;
+          if (typeof object[key] === "object") {
+            value = JSON.stringify(object[key]);
+          } else {
+            value = object[key];
+          }
+
+          if (value.length > 60) {
+            value =
+              value.substr(0, 10) + "..." + value.substr(value.length - 10);
+          }
+
+          numberOfRows++;
+
+          dataStrings.push(`${key}: ${value}`);
+        }
+
+        return dataStrings.join("<br>");
+      }
+
+      $("#instance-filter-dropdown").change(function () {
+        $("#instance-filter").val($(this).val());
+        $("#instance-filter").keyup();
+      });
+
+      $("#instance-filter").keyup(function () {
+        instanceFilter = $(this).val();
+        storeSettings();
+      });
+
+      $("#blacklist-ids-incoming").keyup(function () {
+        incomingBlacklistIds =
+          $(this).val() === ""
+            ? []
+            : $(this)
+                .val()
+                .split(",")
+                .map((x) => parseInt(x));
+        storeSettings();
+      });
+
+      $("#whitelist-ids-incoming").keyup(function () {
+        incomingWhitelistIds =
+          $(this).val() === ""
+            ? []
+            : $(this)
+                .val()
+                .split(",")
+                .map((x) => parseInt(x));
+        storeSettings();
+
+        checkBlacklistIncomingWriteable();
+      });
+
+      $("#blacklist-ids-outgoing").keyup(function () {
+        outgoingBlacklistIds =
+          $(this).val() === ""
+            ? []
+            : $(this)
+                .val()
+                .split(",")
+                .map((x) => parseInt(x));
+        storeSettings();
+      });
+
+      $("#whitelist-ids-outgoing").keyup(function () {
+        outgoingWhitelistIds =
+          $(this).val() === ""
+            ? []
+            : $(this)
+                .val()
+                .split(",")
+                .map((x) => parseInt(x));
+        storeSettings();
+
+        checkBlacklistOutgoingWriteable();
+      });
+
+      function checkBlacklistIncomingWriteable() {
+        if (incomingWhitelistIds.length > 0) {
+          $("#blacklist-ids-incoming").attr("readonly", "readonly");
+        } else {
+          $("#blacklist-ids-incoming").removeAttr("readonly");
+        }
+      }
+
+      function checkBlacklistOutgoingWriteable() {
+        if (outgoingWhitelistIds.length > 0) {
+          $("#blacklist-ids-outgoing").attr("readonly", "readonly");
+        } else {
+          $("#blacklist-ids-outgoing").removeAttr("readonly");
+        }
+      }
+
+      function loadSettings() {
+        let settingsJson = localStorage.getItem("settings");
+        if (settingsJson !== null) {
+          const settings = JSON.parse(settingsJson);
+          STATE = parseInt(settings["STATE"]);
+          instanceFilter = settings["instanceFilter"];
+          incomingBlacklistIds = settings["incomingBlacklistIds"];
+          incomingWhitelistIds = settings["incomingWhitelistIds"];
+          outgoingBlacklistIds = settings["outgoingBlacklistIds"];
+          outgoingWhitelistIds = settings["outgoingWhitelistIds"];
+
+          if (STATE === 1) {
+            $("#play-button").click();
+          }
+          $("#instance-filter").val(instanceFilter);
+          $("#blacklist-ids-incoming").val(incomingBlacklistIds.join(","));
+          $("#blacklist-ids-outgoing").val(outgoingBlacklistIds.join(","));
+          $("#whitelist-ids-incoming").val(incomingWhitelistIds.join(","));
+          $("#whitelist-ids-outgoing").val(outgoingWhitelistIds.join(","));
+        }
+      }
+
+      loadSettings();
+
+      function storeSettings() {
+        localStorage.setItem(
+          "settings",
+          JSON.stringify({
+            STATE: STATE,
+            instanceFilter: instanceFilter,
+            incomingBlacklistIds: incomingBlacklistIds,
+            incomingWhitelistIds: incomingWhitelistIds,
+            outgoingBlacklistIds: outgoingBlacklistIds,
+            outgoingWhitelistIds: outgoingWhitelistIds,
+          })
+        );
+      }
+    </script>
+  </body>
+</html>
