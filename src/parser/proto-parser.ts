@@ -39,7 +39,7 @@ export const decodeProto = (
           let parsedData = foundMethod[1].decode(b64Decode(data)).toJSON();
           returnObject = {
             methodId: foundMethod[0],
-            methodName: foundMethodString,
+            methodName: foundMethodString.replace(/^REQUEST_TYPE_/, ''),
             data: parsedData,
           };
         } catch (error) {
@@ -54,7 +54,7 @@ export const decodeProto = (
           let parsedData = foundMethod[2].decode(b64Decode(data)).toJSON();
           returnObject = {
             methodId: foundMethod[0],
-            methodName: foundMethodString,
+            methodName: foundMethodString.replace(/^REQUEST_TYPE_/, ''),
             data: parsedData,
           };
         } catch (error) {
