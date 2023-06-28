@@ -35,6 +35,7 @@ var httpServer = http.createServer(function (req, res) {
         } else {
           for (let parsedObject of parsedResponseData) {
             parsedObject.identifier =
+              parsedData["uuid"] ||
               parsedData["devicename"] ||
               parsedData["deviceName"] ||
               parsedData["instanceName"];
@@ -58,20 +59,13 @@ var httpServer = http.createServer(function (req, res) {
         } else {
           for (let parsedObject of parsedRequestData) {
             parsedObject.identifier =
+              parsedData["uuid"] ||
               parsedData["devicename"] ||
               parsedData["deviceName"] ||
               parsedData["instanceName"];
             outgoingProtoWebBufferInst.write(parsedObject);
           }
         }
-
-        fs.appendFile(
-          "outgoing-request-log.log",
-          incomingData.join("") + "\n\r",
-          function (err) {
-            if (err) throw err;
-          }
-        );
         res.writeHead(200, { "Content-Type": "application/json" });
         res.end("");
       });
