@@ -1,4 +1,4 @@
-import POGOProtos from "pogo-protos";
+import POGOProtos from "@na-ji/pogo-protos";
 
 export const requestMessagesResponses = {
   REQUEST_TYPE_METHOD_UNSET: [0, null, null],
@@ -323,7 +323,7 @@ export const requestMessagesResponses = {
   REQUEST_TYPE_METHOD_CLAIM_CODENAME: [
     403,
     POGOProtos.Rpc.ClaimCodenameRequestProto,
-    null,
+    POGOProtos.Rpc.CodenameResultProto,
   ],
   REQUEST_TYPE_METHOD_SET_AVATAR: [
     404,
@@ -341,6 +341,11 @@ export const requestMessagesResponses = {
     POGOProtos.Rpc.MarkTutorialCompleteOutProto,
   ],
   REQUEST_TYPE_METHOD_UPDATE_PERFORMANCE_METRICS: [407, null, null],
+  REQUEST_TYPE_METHOD_SET_NEUTRAL_AVATAR: [
+    408,
+    POGOProtos.Rpc.SetNeutralAvatarProto,
+    POGOProtos.Rpc.SetNeutralAvatarOutProto,
+  ],
   REQUEST_TYPE_METHOD_CHECK_CHALLENGE: [
     600,
     POGOProtos.Rpc.CheckChallengeProto,
@@ -463,6 +468,11 @@ export const requestMessagesResponses = {
     POGOProtos.Rpc.SfidaDisassociateRequest,
     POGOProtos.Rpc.SfidaDisassociateResponse,
   ],
+  REQUEST_TYPE_METHOD_WAINA_GET_REWARDS: [
+    825,
+    null,
+    POGOProtos.Rpc.WainaGetRewardsResponse,
+  ],
   REQUEST_TYPE_METHOD_WAINA_SUBMIT_SLEEP_DATA: [
     826,
     POGOProtos.Rpc.WainaSubmitSleepDataRequest,
@@ -470,6 +480,7 @@ export const requestMessagesResponses = {
   ],
   REQUEST_TYPE_METHOD_SATURDAY_TRANSACTION_START: [827, null, null],
   REQUEST_TYPE_METHOD_SATURDAY_TRANSACTION_COMPLETE: [828, null, null],
+  REQUEST_TYPE_METHOD_REIMBURSE_ITEM: [829, null, null],
   REQUEST_TYPE_METHOD_GET_NEW_QUESTS: [
     900,
     POGOProtos.Rpc.GetNewQuestsProto,
@@ -897,12 +908,7 @@ export const requestMessagesResponses = {
     POGOProtos.Rpc.ProgressRouteProto,
     POGOProtos.Rpc.ProgressRouteOutProto,
   ],
-  REQUEST_TYPE_METHOD_PROCESS_ROUTE_WAYPOINT_INTERACTION: [
-    1407,
-    POGOProtos.Rpc.ProcessRouteWaypointInteractionProto,
-    POGOProtos.Rpc.ProcessRouteWaypointInteractionOutProto,
-  ],
-  REQUEST_TYPE_METHOD_PROCESS_ROUTE_TAPPABLE: [
+  REQUEST_TYPE_METHOD_PROCESS_TAPPABLE: [
     1408,
     POGOProtos.Rpc.ProcessRouteTappableProto,
     POGOProtos.Rpc.ProcessRouteTappableOutProto,
@@ -919,6 +925,12 @@ export const requestMessagesResponses = {
   ],
   REQUEST_TYPE_METHOD_LIST_ROUTE_STAMPS: [1411, null, null],
   REQUEST_TYPE_METHOD_RATE_ROUTE: [1412, null, null],
+  REQUEST_TYPE_METHOD_CREATE_ROUTE_DRAFT: [1413, null, null],
+  REQUEST_TYPE_METHOD_DELETE_ROUTE_DRAFT: [1414, null, null],
+  REQUEST_TYPE_METHOD_REPORT_ROUTE: [1415, null, null],
+  REQUEST_TYPE_METHOD_SPAWN_TAPPABLE: [1416, null, null],
+  REQUEST_TYPE_METHOD_ROUTE_ENCOUNTER: [1417, null, null],
+  REQUEST_TYPE_METHOD_CAN_REPORT_ROUTE: [1418, null, null],
   REQUEST_TYPE_METHOD_CREATE_BUDDY_MUTLIPLAYER_SESSION: [
     1456,
     POGOProtos.Rpc.CreateBuddyMultiplayerSessionProto,
@@ -1163,7 +1175,61 @@ export const requestMessagesResponses = {
     POGOProtos.Rpc.SendFriendRequestViaPlayerIdProto,
     POGOProtos.Rpc.SendFriendRequestViaPlayerIdOutProto,
   ],
-  REQUEST_TYPE_METHOD_GET_RAID_LOBBY_COUNTER: [2011, POGOProtos.Rpc.GetRaidLobbyCounterProto, POGOProtos.Rpc.GetRaidLobbyCounterOutProto],
+  REQUEST_TYPE_METHOD_GET_RAID_LOBBY_COUNTER: [
+    2011,
+    POGOProtos.Rpc.GetRaidLobbyCounterProto,
+    POGOProtos.Rpc.GetRaidLobbyCounterOutProto,
+  ],
+  REQUEST_TYPE_METHOD_CHECK_POKEMON_SIZE_CONTEST_ELIGIBILITY: [
+    2100,
+    POGOProtos.Rpc.CheckPokemonSizeContestEligibilityProto,
+    null,
+  ],
+  REQUEST_TYPE_METHOD_UPDATE_POKEMON_SIZE_CONTEST_ENTRY: [
+    2101,
+    POGOProtos.Rpc.UpdatePokemonSizeContestEntryProto,
+    POGOProtos.Rpc.UpdatePokemonSizeContestEntryOutProto,
+  ],
+  REQUEST_TYPE_METHOD_TRANSFER_POKEMON_SIZE_CONTEST_ENTRY: [2102, null, null],
+  REQUEST_TYPE_METHOD_REMOVE_POKEMON_SIZE_CONTEST_ENTRY: [2103, null, null],
+  REQUEST_TYPE_METHOD_GET_POKEMON_SIZE_CONTEST_ENTRY: [
+    2104,
+    POGOProtos.Rpc.GetPokemonSizeContestEntryProto,
+    POGOProtos.Rpc.GetPokemonSizeContestEntryOutProto,
+  ],
+  REQUEST_TYPE_METHOD_GET_CONTEST_DATA: [
+    2105,
+    POGOProtos.Rpc.GetContestDataProto,
+    POGOProtos.Rpc.GetContestDataOutProto,
+  ],
+  REQUEST_TYPE_METHOD_GET_CONTESTS_UNCLAIMED_REWARDS: [
+    2106,
+    POGOProtos.Rpc.GetContestsUnclaimedRewardsProto,
+    POGOProtos.Rpc.GetContestsUnclaimedRewardsOutProto,
+  ],
+  REQUEST_TYPE_METHOD_CLAIM_CONTESTS_REWARDS: [
+    2107,
+    POGOProtos.Rpc.ClaimContestsRewardsProto,
+    POGOProtos.Rpc.ClaimContestsRewardsOutProto,
+  ],
+  REQUEST_TYPE_METHOD_GET_ENTERED_CONTEST: [
+    2108,
+    POGOProtos.Rpc.GetEnteredContestProto,
+    POGOProtos.Rpc.GetEnteredContestOutProto,
+  ],
+  REQUEST_TYPE_METHOD_GET_POKEMON_SIZE_CONTEST_FRIEND_ENTRY: [2109, null, null],
+  REQUEST_TYPE_METHOD_CREATE_PARTY: [2300, null, null],
+  REQUEST_TYPE_METHOD_JOIN_PARTY: [2301, null, null],
+  REQUEST_TYPE_METHOD_START_PARTY: [
+    2302,
+    null,
+    POGOProtos.Rpc.StartPartyOutProto,
+  ],
+  REQUEST_TYPE_METHOD_LEAVE_PARTY: [2303, null, null],
+  REQUEST_TYPE_METHOD_GET_PARTY: [2304, null, null],
+  REQUEST_TYPE_METHOD_UPDATE_PARTY_LOCATION: [2305, null, null],
+  REQUEST_TYPE_METHOD_START_PARTY_QUEST: [2308, null, null],
+  REQUEST_TYPE_METHOD_GET_BONUS_ATTRACTED_POKEMON: [2350, null, null],
   REQUEST_TYPE_METHOD_GET_VPS_EVENTS: [
     3000,
     POGOProtos.Rpc.GetVpsEventProto,
@@ -1373,11 +1439,9 @@ export const requestMessagesResponses = {
     POGOProtos.Rpc.UpdateAdventureSyncSettingsRequestProto,
     POGOProtos.Rpc.UpdateAdventureSyncSettingsResponseProto,
   ],
-  REQUEST_TYPE_CLIENT_ACTION_SET_BIRTHDAY: [
-    5048,
-    POGOProtos.Rpc.UpdateAdventureSyncSettingsRequestProto,
-    POGOProtos.Rpc.UpdateAdventureSyncSettingsResponseProto,
-  ],
+  REQUEST_TYPE_CLIENT_ACTION_SET_BIRTHDAY: [5048, null, null],
+  REQUEST_TYPE_CLIENT_ACTION_FETCH_NEWSFEED_ACTION: [5049, null, null],
+  REQUEST_TYPE_CLIENT_ACTION_MARK_NEWSFEED_READ_ACTION: [5050, null, null],
   REQUEST_TYPE_SOCIAL_ACTION_SEARCH_PLAYER: [
     10000,
     POGOProtos.Rpc.SearchPlayerProto,
@@ -1497,6 +1561,26 @@ export const requestMessagesResponses = {
     10024,
     POGOProtos.Rpc.RemoveFavoriteFriendRequest,
     POGOProtos.Rpc.RemoveFavoriteFriendResponse,
+  ],
+  REQUEST_TYPE_SOCIAL_ACTION_BLOCK_ACCOUNT: [
+    10025,
+    POGOProtos.Rpc.BlockAccountProto,
+    POGOProtos.Rpc.BlockAccountOutProto,
+  ],
+  REQUEST_TYPE_SOCIAL_ACTION_UNBLOCK_ACCOUNT: [
+    10026,
+    POGOProtos.Rpc.UnblockAccountProto,
+    POGOProtos.Rpc.UnblockAccountOutProto,
+  ],
+  REQUEST_TYPE_SOCIAL_ACTION_GET_OUTGING_BLOCKS: [
+    10027,
+    POGOProtos.Rpc.GetOutgoingBlocksProto,
+    POGOProtos.Rpc.GetOutgoingBlocksOutProto,
+  ],
+  REQUEST_TYPE_SOCIAL_ACTION_IS_ACCOUNT_BLOCKED: [
+    10028,
+    POGOProtos.Rpc.IsAccountBlockedProto,
+    POGOProtos.Rpc.IsAccountBlockedOutProto,
   ],
   REQUEST_TYPE_SOCIAL_ACTION_REGISTER_PUSH_NOTIFICATION: [
     10101,
@@ -1631,6 +1715,11 @@ export const requestMessagesResponses = {
   REQUEST_TYPE_SOCIAL_ACTION_RESERVED_ACTION_3: [20400, null, null],
   REQUEST_TYPE_SOCIAL_ACTION_RESERVED_ACTION_4: [20401, null, null],
   REQUEST_TYPE_SOCIAL_ACTION_RESERVED_ACTION_5: [20402, null, null],
+  REQUEST_TYPE_SOCIAL_ACTION_GET_FRIEND_RECOMMENDATION: [
+    20500,
+    POGOProtos.Rpc.GetFriendRecommendationRequest,
+    POGOProtos.Rpc.GetFriendRecommendationResponse,
+  ],
   REQUEST_TYPE_GAME_ACTION_CLIENT_REGISTER_BACKGROUND_SERVICE: [
     230000,
     POGOProtos.Rpc.RegisterBackgroundServiceRequestProto,
@@ -1742,6 +1831,12 @@ export const requestMessagesResponses = {
       POGOProtos.Rpc.GetPlayerSubmissionValidationSettingsProto,
       POGOProtos.Rpc.GetPlayerSubmissionValidationSettingsOutProto,
     ],
+  REQUEST_TYPE_PLAYER_SUBMISSION_ACTION_D2D_ADD_NEW_POI: [620004, null, null],
+  REQUEST_TYPE_PLAYER_SUBMISSION_ACTION_D2D_GET_SIGNED_URL_FOR_PHOTO_UPLOAD: [
+    620005,
+    null,
+    null,
+  ],
   REQUEST_TYPE_PLAYER_SUBMISSION_ACTION_SUBMIT_POI_IMAGE: [
     620100,
     POGOProtos.Rpc.SubmitPoiImageProto,
@@ -1777,6 +1872,26 @@ export const requestMessagesResponses = {
     POGOProtos.Rpc.SubmitPoiCategoryVoteRecordProto,
     null,
   ],
+  REQUEST_TYPE_PLAYER_SUBMISSION_ACTION_D2D_SUBMIT_POI_IMAGE: [
+    620107,
+    null,
+    null,
+  ],
+  REQUEST_TYPE_PLAYER_SUBMISSION_ACTION_D2D_SUBMIT_POI_TEXT_METADATA_UPDATE: [
+    620108,
+    null,
+    null,
+  ],
+  REQUEST_TYPE_PLAYER_SUBMISSION_ACTION_D2D_SUBMIT_POI_LOCATION_UPDATE: [
+    620109,
+    null,
+    null,
+  ],
+  REQUEST_TYPE_PLAYER_SUBMISSION_ACTION_D2D_SUBMIT_POI_TAKEDOWN_REQUEST: [
+    620110,
+    null,
+    null,
+  ],
   REQUEST_TYPE_PLAYER_SUBMISSION_ACTION_ADD_NEW_ROUTE: [620200, null, null],
   REQUEST_TYPE_PLAYER_SUBMISSION_ACTION_GENERATE_GMAP_SIGNED_URL: [
     620300,
@@ -1807,6 +1922,31 @@ export const requestMessagesResponses = {
     620403,
     POGOProtos.Rpc.GetARMappingSettingsProto,
     POGOProtos.Rpc.GetARMappingSettingsOutProto,
+  ],
+  REQUEST_TYPE_PLAYER_SUBMISSION_ACTION_D2D_SUBMIT_POI_AR_VIDEO_METADATA: [
+    620404,
+    null,
+    null,
+  ],
+  REQUEST_TYPE_PLAYER_SUBMISSION_ACTION_D2D_GET_GRAPESHOT_FILE_UPLOAD_URL: [
+    620405,
+    null,
+    null,
+  ],
+  REQUEST_TYPE_PLAYER_SUBMISSION_ACTION_D2D_ASYNC_FILE_UPLOAD_COMPLETE: [
+    620406,
+    null,
+    null,
+  ],
+  REQUEST_TYPE_PLAYER_SUBMISSION_ACTION_SUBMIT_MAPPING_REQUEST: [
+    620407,
+    null,
+    null,
+  ],
+  REQUEST_TYPE_PLAYER_SUBMISSION_ACTION_D2D_SUBMIT_MAPPING_REQUEST: [
+    620408,
+    null,
+    null,
   ],
   REQUEST_TYPE_PLAYER_SUBMISSION_ACTION_GET_IMAGES_FOR_POI: [
     620500,
