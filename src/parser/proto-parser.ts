@@ -2,8 +2,6 @@ import { b64Decode } from "../utils";
 import { requestMessagesResponses } from "../constants";
 import { DecodedProto } from "../types";
 
-
-
 export const decodePayloadTraffic = (
   methodId: number,
   content: any,
