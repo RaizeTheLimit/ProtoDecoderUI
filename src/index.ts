@@ -1,6 +1,5 @@
 import http from "http";
 import fs from "fs";
-require("dotenv").config();
 import config from "./config/config.json";
 
 import { WebStreamBuffer } from "./utils";
