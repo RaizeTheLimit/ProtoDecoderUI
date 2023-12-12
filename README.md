@@ -11,6 +11,7 @@ Default Port: 8081
 Request Route: /debug
 Response Route: /raw
 Web Interface to View Protos: /
+Traffic Route mode /traffic
 
 
 Web Interface: 

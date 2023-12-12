@@ -3,7 +3,7 @@ import fs from "fs";
 require("dotenv").config();
 
 import { WebStreamBuffer } from "./utils";
-import { decodePayload } from "./parser/proto-parser";
+import { decodePayload, decodePayloadTraffic } from "./parser/proto-parser";
 
 // utils
 const incomingProtoWebBufferInst = new WebStreamBuffer();
@@ -15,6 +15,45 @@ var httpServer = http.createServer(function (req, res) {
   let incomingData: Array<Buffer> = [];
 
   switch (req.url) {
+    case "/traffic":   
+      req.on("data", function (chunk) {
+        incomingData.push(chunk);
+      });
+      req.on("end", function () {
+        const requestData = incomingData.join("");
+        let parsedData = JSON.parse(requestData);
+        res.writeHead(200, { "Content-Type": "application/json" });
+        res.end("");
+        for (let i = 0; i < parsedData['protos'].length; i++) { 
+          const parsedResponseData = decodePayloadTraffic(
+            parsedData['protos'][i].method,
+            parsedData['protos'][i].response,
+            "response"
+          );
+          if (typeof parsedResponseData === "string") {
+            incomingProtoWebBufferInst.write({ error: parsedResponseData });
+          } else {
+            for (let parsedObject of parsedResponseData) {
+              parsedObject.identifier = "Furtif_APK";            
+              incomingProtoWebBufferInst.write(parsedObject);
+            }
+          }
+          const parsedRequestData = decodePayloadTraffic(
+            parsedData['protos'][i].method,
+            parsedData['protos'][i].request, 
+            "request"
+          );
+          if (typeof parsedRequestData === "string") {
+            outgoingProtoWebBufferInst.write({ error: parsedRequestData });
+          } else {
+            for (let parsedObject of parsedRequestData) {
+              parsedObject.identifier = "Furtif_APK";       
+              outgoingProtoWebBufferInst.write(parsedObject);
+            }
+          }
+        }
+      });
+      break;
     case "/raw":
       req.on("data", (chunk) => {
         incomingData.push(chunk);

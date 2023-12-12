@@ -2,6 +2,19 @@ import { b64Decode } from "../utils";
 import { requestMessagesResponses } from "../constants";
 import { DecodedProto } from "../types";
 
+export const decodePayloadTraffic = (
+  methodId: number,
+  content: any,
+  dataType: string
+): DecodedProto[] => {
+  let parsedProtoData: DecodedProto[] = [];
+  const decodedProto = decodeProto(methodId, content, dataType);
+  if (typeof decodedProto !== "string") {
+    parsedProtoData.push(decodedProto);
+  }
+
+  return parsedProtoData;
+};
 
 export const decodePayload = (
   contents: any,
