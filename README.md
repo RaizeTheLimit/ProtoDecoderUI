@@ -97,6 +97,7 @@ npm install && npm run build
 npm run start
 ```
 
+### Note yarn is recommended!
 
 
 ## Credits
