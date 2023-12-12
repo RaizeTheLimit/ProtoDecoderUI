@@ -11,4 +11,4 @@ export function moduleConfigIsAvailable() {
     }
 }
 
-export * from "./web-stream-buffer"
+export * from "./web-stream-buffer";

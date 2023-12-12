@@ -3,3 +3,5 @@ node_modules
 dist
 *.log
 /src/config/config.json
+/.vs/
+/.idea/
