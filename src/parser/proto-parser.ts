@@ -2,6 +2,47 @@ import { b64Decode } from "../utils";
 import { requestMessagesResponses } from "../constants";
 import { DecodedProto } from "../types";
 
+// For decode dynamics action social.
+let action_social = 0;
+/**
+ * Callback as used by {@link DecoderInternalPayloadAsResponse}.
+ * @type {function}
+ * @param {number|any}
+ */
+/**
+ * Returns decoded proto as JSON. Uses Tuples by https://github.com/Furtif/pogo-protos/blob/master/test/test.js, if that implemented.
+ */
+function DecoderInternalPayloadAsResponse(method: number, data: any): any {
+	// Reset value.
+	action_social = 0;
+	let proto_tuple: any = Object.values(requestMessagesResponses)[method];
+	let result: any = { Not_Implemented_yet: data };
+	for (let i = 0; i < Object.keys(requestMessagesResponses).length; i++) {
+		proto_tuple = Object.values(requestMessagesResponses)[i];
+		const my_req = proto_tuple[0];
+		if (my_req == method) {
+			if (proto_tuple[2] != null && (data != null || data != '')) {
+				try {
+					result = proto_tuple[2].decode(b64Decode(data)).toJSON();
+          /*
+          // This not need more because protos as replaced bytes for the proto.
+					if (method == 10010) {
+						let profile = POGOProtos.Rpc.PlayerPublicProfileProto.decode(b64Decode(result.friend[0].player.public_data)).toJSON();
+						result.friend[0].player.public_data = profile;
+					}
+          */
+				}
+				catch (error) {
+          console.log(`Intenal ProxySocial decoder ${my_req} Error: ${error}`)
+					result = data;
+				}
+			}
+			return result;
+		}
+	}
+	return result;
+}
+
 export const decodePayloadTraffic = (
   methodId: number,
   content: any,
@@ -49,10 +90,25 @@ export const decodeProto = (
     if (foundReq == method) {
       if (foundMethod[1] != null && dataType === "request") {
         try {
-          let parsedData = foundMethod[1].decode(b64Decode(data)).toJSON();
+          let parsedData = foundMethod[1].decode(b64Decode(data)).toJSON();     
+          if (foundMethod[0] == 5012) {
+            action_social = parsedData.action;
+            Object.values(requestMessagesResponses).forEach(val => {
+              let req: any = val;
+              if (req[0] == action_social && req[1] != null && parsedData.payload) {
+                parsedData.payload = req[1].decode(b64Decode(parsedData.payload)).toJSON();
+              }
+            });
+          }
           returnObject = {
             methodId: foundMethod[0],
-            methodName: foundMethodString.replace(/^REQUEST_TYPE_/, ''),
+            methodName: foundMethodString.replace(/^REQUEST_TYPE_/, '')
+            .replace(/^METHOD_/, '')
+            .replace(/^CLIENT_ACTION_/, '')
+            .replace(/^SOCIAL_ACTION_/, '')
+            .replace(/^GAME_ANTICHEAT_ACTION_/, '')
+            .replace(/^GAME_ACTION_/, '')
+            .replace(/^PLAYER_SUBMISSION_ACTION_/, ''),
             data: parsedData,
           };
         } catch (error) {
@@ -65,9 +121,18 @@ export const decodeProto = (
       if (foundMethod[2] != null && dataType === "response") {
         try {
           let parsedData = foundMethod[2].decode(b64Decode(data)).toJSON();
+          if (foundMethod[0] == 5012 && action_social > 0) {
+						parsedData.payload = DecoderInternalPayloadAsResponse(action_social, parsedData.payload);
+					}
           returnObject = {
             methodId: foundMethod[0],
-            methodName: foundMethodString.replace(/^REQUEST_TYPE_/, ''),
+            methodName: foundMethodString.replace(/^REQUEST_TYPE_/, '')
+            .replace(/^METHOD_/, '')
+            .replace(/^CLIENT_ACTION_/, '')
+            .replace(/^SOCIAL_ACTION_/, '')
+            .replace(/^GAME_ANTICHEAT_ACTION_/, '')
+            .replace(/^GAME_ACTION_/, '')
+            .replace(/^PLAYER_SUBMISSION_ACTION_/, ''),
             data: parsedData,
           };
         } catch (error) {
