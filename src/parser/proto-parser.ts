@@ -33,8 +33,12 @@ function DecoderInternalPayloadAsResponse(method: number, data: any): any {
           */
 				}
 				catch (error) {
-          console.log(`Intenal ProxySocial decoder ${my_req} Error: ${error}`)
-					result = data;
+          console.log(`Intenal ProxySocial decoder ${my_req} Error: ${error}`);
+          let err = {
+            Error: error,
+            Data: data
+          };
+          result = err;
 				}
 			}
 			return result;
