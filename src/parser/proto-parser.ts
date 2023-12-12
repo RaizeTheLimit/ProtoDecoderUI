@@ -21,7 +21,7 @@ function DecoderInternalPayloadAsResponse(method: number, data: any): any {
 		proto_tuple = Object.values(requestMessagesResponses)[i];
 		const my_req = proto_tuple[0];
 		if (my_req == method) {
-			if (proto_tuple[2] != null && (data != null || data != '')) {
+			if (proto_tuple[2] != null && (data != null || data != '') && b64Decode(data)) {
 				try {
 					result = proto_tuple[2].decode(b64Decode(data)).toJSON();
           /*
