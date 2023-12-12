@@ -42,6 +42,24 @@ interface IncomingData {
 
 ```
 
+## Support for Trafficlight interfaces
+**Sent to** `/traffic`
+
+```js
+interface CombinedMessage {
+    rpcid?: number
+    rpcstatus?: number
+    rpchandle?: number
+    protos: [
+        {
+            method: number,
+            request: string,
+            response: string
+        }
+    ]
+}
+```
+
 ### Requirements
 
 ```
