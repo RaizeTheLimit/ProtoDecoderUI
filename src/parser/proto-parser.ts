@@ -122,7 +122,7 @@ export const decodeProto = (
         try {
           let parsedData = foundMethod[2].decode(b64Decode(data)).toJSON();
           if (foundMethod[0] == 5012 && action_social > 0) {
-						parsedData.payload = DecoderInternalPayloadAsResponse(action_social, parsedData.payload);
+            parsedData.payload = DecoderInternalPayloadAsResponse(action_social, parsedData.payload);
 					}
           returnObject = {
             methodId: foundMethod[0],
