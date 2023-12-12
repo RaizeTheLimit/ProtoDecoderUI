@@ -2,7 +2,6 @@
 
 ProtoDecodeUI is a Tool to help analyze incoming and outgoing game data. 
 
-
 ### Support
 Supports Decoding Requests and Response Messages
 
@@ -20,7 +19,6 @@ Supports Start/Pause/Clearing of the proto stream
 Method Filtering by Whitelisting or Blackisting (whitelist overrides Blacklist)
 
 ```
-
 
 ### Incoming Data Types
 Both endpoints support the same basic interface supplied by most popular MITM, **You must have at least one of the optional parameters as an identifier**
@@ -67,14 +65,12 @@ Node 16 + (Tested on as low as version 16.14.0
 Yarn or NPM package manager
 ```
 
-
 ## Setup and Running
 
 ```bash
 git clone git@github.com:RaizeTheLimit/ProtoDecoderUI.git
 cd ./ProtoDecoderUI
 ```
-
 
 ### Important
 
@@ -90,15 +86,6 @@ yarn
 yarn build
 yarn start
 ```
-
-NPM setup:
-```bash
-npm install && npm run build
-npm run start
-```
-
-### Note yarn is recommended!
-
 
 ## Credits
 
