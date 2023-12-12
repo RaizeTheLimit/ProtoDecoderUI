@@ -1,9 +1,21 @@
 import http from "http";
 import fs from "fs";
-import config from "./config/config.json";
 
 import { WebStreamBuffer } from "./utils";
 import { decodePayload, decodePayloadTraffic } from "./parser/proto-parser";
+
+function moduleIsAvailable (path) {
+  try {
+      require.resolve(path);
+      return true;
+  } catch (e) {
+      return false;
+  }
+}
+// try looking if config file exists...
+let config = require("./config/example.config.json");
+if (moduleIsAvailable("./config/config.json"))
+  config = require("./config/config.json");
 
 // utils
 const incomingProtoWebBufferInst = new WebStreamBuffer();
