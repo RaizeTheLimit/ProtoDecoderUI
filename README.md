@@ -42,7 +42,7 @@ interface IncomingData {
 
 ```
 
-## Support for Trafficlight interfaces
+### Support for Trafficlight interfaces
 **Sent to** `/traffic`
 
 ```js
@@ -52,8 +52,8 @@ interface CombinedMessage {
     rpchandle?: number
     protos: [
         {
-            method: number,
-            request: string,
+            method: number
+            request: string
             response: string
         }
     ]
