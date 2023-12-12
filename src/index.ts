@@ -1,6 +1,6 @@
 import http from "http";
 import fs from "fs";
-import { WebStreamBuffer, moduleConfigIsAvailable } from "./utils";
+import { WebStreamBuffer, getIPAddress, moduleConfigIsAvailable } from "./utils";
 import { decodePayload, decodePayloadTraffic } from "./parser/proto-parser";
 
 // try looking if config file exists...
@@ -12,10 +12,10 @@ if (moduleConfigIsAvailable()) {
 // utils
 const incomingProtoWebBufferInst = new WebStreamBuffer();
 const outgoingProtoWebBufferInst = new WebStreamBuffer();
+const portBind = config["default_port"];
 
 // server
-var portBind = config["default_port"];
-var httpServer = http.createServer(function (req, res) {
+const httpServer = http.createServer(function (req, res) {
     let incomingData: Array<Buffer> = [];
     switch (req.url) {
         case "/traffic":
@@ -162,5 +162,5 @@ var outgoing = io.of("/outgoing").on("connection", function (socket) {
 
 httpServer.keepAliveTimeout = 0;
 httpServer.listen(portBind, function () {
-    console.log("server start at port " + portBind);
+    console.log(`Server start access of this in urls: http://localhost:${portBind} or WLAN mode http://${getIPAddress()}:${portBind}`);
 });
