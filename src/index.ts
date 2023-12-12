@@ -1,31 +1,22 @@
 import http from "http";
 import fs from "fs";
-
-import { WebStreamBuffer } from "./utils";
+import { WebStreamBuffer, moduleConfigIsAvailable } from "./utils";
 import { decodePayload, decodePayloadTraffic } from "./parser/proto-parser";
 
-function moduleIsAvailable (path) {
-  try {
-      require.resolve(path);
-      return true;
-  } catch (e) {
-      return false;
-  }
-}
 // try looking if config file exists...
 let config = require("./config/example.config.json");
-if (moduleIsAvailable("./config/config.json"))
+if (moduleConfigIsAvailable())
   config = require("./config/config.json");
+// end config
 
 // utils
 const incomingProtoWebBufferInst = new WebStreamBuffer();
 const outgoingProtoWebBufferInst = new WebStreamBuffer();
 
+// server
 var portBind = config["default_port"];
-
 var httpServer = http.createServer(function (req, res) {
   let incomingData: Array<Buffer> = [];
-
   switch (req.url) {
     case "/traffic":   
       req.on("data", function (chunk) {
@@ -43,7 +34,6 @@ var httpServer = http.createServer(function (req, res) {
             parsedData['protos'][i].request, 
             "request"
           );
-
           if (typeof parsedRequestData === "string") {
             incomingProtoWebBufferInst.write({ error: parsedRequestData });
           } else {
@@ -145,16 +135,13 @@ var httpServer = http.createServer(function (req, res) {
 });
 
 var io = require("socket.io")(httpServer);
-
 var incoming = io.of("/incoming").on("connection", function (socket) {
   const reader = {
     read: function (data: object) {
       incoming.emit("protos", data);
     },
   };
-
   incomingProtoWebBufferInst.addReader(reader);
-
   socket.on("disconnect", function () {
     incomingProtoWebBufferInst.removeReader(reader);
   });
@@ -166,9 +153,7 @@ var outgoing = io.of("/outgoing").on("connection", function (socket) {
       outgoing.emit("protos", data);
     },
   };
-
   outgoingProtoWebBufferInst.addReader(reader);
-
   socket.on("disconnect", function () {
     outgoingProtoWebBufferInst.removeReader(reader);
   });

@@ -3,6 +3,4 @@ export type DecodedProto = {
     methodId: string;
     methodName: string;
     data: string;
-  };
-
-  
+};
