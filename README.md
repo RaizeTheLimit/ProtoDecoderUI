@@ -70,26 +70,29 @@ Yarn or NPM package manager
 
 ## Setup and Running
 
-```
+```bash
 git clone git@github.com:RaizeTheLimit/ProtoDecoderUI.git
 cd ./ProtoDecoderUI
 ```
 
 
-if you would like to change the port, create a `.env` file in the project root with the following
-```
-PORT=8081  # Desired Port
+### Important
+
+**Copy and adjust config file**
+```bash
+# Copy the config.json file
+cp example.config.json config.json
 ```
 
 Yarn setup:
-```
+```bash
 yarn
 yarn build
 yarn start
 ```
 
 NPM setup:
-```
+```bash
 npm install && npm run build
 npm run start
 ```
