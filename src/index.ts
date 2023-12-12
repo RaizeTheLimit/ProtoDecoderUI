@@ -20,34 +20,36 @@ var httpServer = http.createServer(function (req, res) {
         incomingData.push(chunk);
       });
       req.on("end", function () {
+        const identifier =  "Furtif_APK";
         const requestData = incomingData.join("");
         let parsedData = JSON.parse(requestData);
         res.writeHead(200, { "Content-Type": "application/json" });
         res.end("");
-        for (let i = 0; i < parsedData['protos'].length; i++) { 
+        for (let i = 0; i < parsedData['protos'].length; i++) {
+          const parsedRequestData = decodePayloadTraffic(
+            parsedData['protos'][i].method,
+            parsedData['protos'][i].request, 
+            "request"
+          );
+
+          if (typeof parsedRequestData === "string") {
+            incomingProtoWebBufferInst.write({ error: parsedRequestData });
+          } else {
+            for (let parsedObject of parsedRequestData) {
+              parsedObject.identifier = identifier;       
+              incomingProtoWebBufferInst.write(parsedObject);
+            }
+          } 
           const parsedResponseData = decodePayloadTraffic(
             parsedData['protos'][i].method,
             parsedData['protos'][i].response,
             "response"
           );
           if (typeof parsedResponseData === "string") {
-            incomingProtoWebBufferInst.write({ error: parsedResponseData });
+            outgoingProtoWebBufferInst.write({ error: parsedResponseData });
           } else {
             for (let parsedObject of parsedResponseData) {
-              parsedObject.identifier = "Furtif_APK";            
-              incomingProtoWebBufferInst.write(parsedObject);
-            }
-          }
-          const parsedRequestData = decodePayloadTraffic(
-            parsedData['protos'][i].method,
-            parsedData['protos'][i].request, 
-            "request"
-          );
-          if (typeof parsedRequestData === "string") {
-            outgoingProtoWebBufferInst.write({ error: parsedRequestData });
-          } else {
-            for (let parsedObject of parsedRequestData) {
-              parsedObject.identifier = "Furtif_APK";       
+              parsedObject.identifier = identifier;            
               outgoingProtoWebBufferInst.write(parsedObject);
             }
           }
@@ -61,10 +63,8 @@ var httpServer = http.createServer(function (req, res) {
       req.on("end", () => {
         const requestData = incomingData.join("");
         let parsedData = JSON.parse(requestData);
-
         res.writeHead(200, { "Content-Type": "application/json" });
         res.end("");
-
         const parsedResponseData = decodePayload(
           parsedData.contents,
           "response"
@@ -90,9 +90,9 @@ var httpServer = http.createServer(function (req, res) {
       req.on("end", function () {
         const requestData = incomingData.join("");
         let parsedData = JSON.parse(requestData);
-
+        res.writeHead(200, { "Content-Type": "application/json" });
+        res.end("");
         const parsedRequestData = decodePayload(parsedData.contents, "request");
-
         if (typeof parsedRequestData === "string") {
           outgoingProtoWebBufferInst.write({ error: parsedRequestData });
         } else {
@@ -105,12 +105,7 @@ var httpServer = http.createServer(function (req, res) {
             outgoingProtoWebBufferInst.write(parsedObject);
           }
         }
-        res.writeHead(200, { "Content-Type": "application/json" });
-        res.end("");
       });
-
-      res.writeHead(200, { "Content-Type": "application/json" });
-      res.end("");
       break;
     case "/json-viewer/jquery.json-viewer.css":
       res.writeHead(200, { "Content-Type": "text/css" });
