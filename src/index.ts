@@ -1,6 +1,6 @@
 import http from "http";
 import fs from "fs";
-require("dotenv").config();
+import config from "./config/config.json";
 
 import { WebStreamBuffer } from "./utils";
 import { decodePayload, decodePayloadTraffic } from "./parser/proto-parser";
@@ -9,7 +9,7 @@ import { decodePayload, decodePayloadTraffic } from "./parser/proto-parser";
 const incomingProtoWebBufferInst = new WebStreamBuffer();
 const outgoingProtoWebBufferInst = new WebStreamBuffer();
 
-var portBind = process.env.PORT || "8081";
+var portBind = config["default_port"];
 
 var httpServer = http.createServer(function (req, res) {
   let incomingData: Array<Buffer> = [];
@@ -20,7 +20,7 @@ var httpServer = http.createServer(function (req, res) {
         incomingData.push(chunk);
       });
       req.on("end", function () {
-        const identifier =  "Furtif_APK";
+        const identifier =  config["trafficlight_identifier"];
         const requestData = incomingData.join("");
         let parsedData = JSON.parse(requestData);
         res.writeHead(200, { "Content-Type": "application/json" });
