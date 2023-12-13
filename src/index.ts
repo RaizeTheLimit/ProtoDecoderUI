@@ -28,6 +28,8 @@ const httpServer = http.createServer(function (req, res) {
                 res.writeHead(200, { "Content-Type": "application/json" });
                 res.end("");
                 // redirect because endpoint is in use there, leave null to ignore.
+                // ex http://123.123.123.123:9001/raw
+                // this need a test ping ok or throw for better.
                 if (config["redirect_to_golbat_url"]) {
                     redirect_post_golbat(config["redirect_to_golbat_url"], requestData)
                 }
