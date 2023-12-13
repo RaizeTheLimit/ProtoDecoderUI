@@ -62,7 +62,7 @@ const httpServer = http.createServer(function (req, res) {
                 }
             });
             break;
-       case "/traffic":
+        case "/traffic":
             req.on("data", function (chunk) {
                 incomingData.push(chunk);
             });
