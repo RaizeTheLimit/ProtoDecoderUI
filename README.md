@@ -72,8 +72,10 @@ interface CombinedMessage {
     trainerlvl?: number
     contents : [
         {
-            method: number,
-            data: string
+            type: number
+            request: string
+            payload: string
+            have_ar?: boolean
         }
     ]
 }
