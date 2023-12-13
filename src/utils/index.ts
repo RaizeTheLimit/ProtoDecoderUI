@@ -28,8 +28,8 @@ export function getIPAddress() {
     return '0.0.0.0';
 }
 
-export function redirect_post_golbat(url_rediret: string, redirect_data: any) {
-    const url = parse(url_rediret);
+export function redirect_post_golbat(url_redirect: string, redirect_data: any) {
+    const url = parse(url_redirect);
     const request = http.request({
         method: "POST",
         headers: {
