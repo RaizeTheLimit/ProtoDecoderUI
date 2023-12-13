@@ -1,4 +1,5 @@
 {
   "default_port": 8081,
-  "trafficlight_identifier": "AwesomeProtoSender"
+  "trafficlight_identifier": "AwesomeProtoSender",
+  "redirect_to_golbat_url": null
 }

@@ -1,6 +1,6 @@
 import http from "http";
 import fs from "fs";
-import { WebStreamBuffer, getIPAddress, moduleConfigIsAvailable } from "./utils";
+import { WebStreamBuffer, getIPAddress, moduleConfigIsAvailable, redirect_post } from "./utils";
 import { decodePayload, decodePayloadTraffic } from "./parser/proto-parser";
 
 // try looking if config file exists...
@@ -27,6 +27,10 @@ const httpServer = http.createServer(function (req, res) {
                 let parsedData = JSON.parse(requestData);
                 res.writeHead(200, { "Content-Type": "application/json" });
                 res.end("");
+                // redirect because endpoint is in use there.
+                if (config["redirect_to_golbat_url"]) {
+                    redirect_post(config["redirect_to_golbat_url"], parsedData)
+                }
                 const identifier = parsedData['username'];
                 for (let i = 0; i < parsedData['contents'].length; i++) {
                     const parsedRequestData = decodePayloadTraffic(
