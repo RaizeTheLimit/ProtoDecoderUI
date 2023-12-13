@@ -1,16 +1,21 @@
+<!-- define variables -->
+[1.1]: http://i.imgur.com/M4fJ65n.png (ATTENTION)
 # ProtoDecoderUI [![Test Build](https://github.com/RaizeTheLimit/ProtoDecoderUI/actions/workflows/test.yml/badge.svg)](https://github.com/RaizeTheLimit/ProtoDecoderUI/actions/workflows/test.yml)
 
-ProtoDecodeUI is a Tool to help analyze incoming and outgoing game data. 
+![alt text][1.1] <strong><em>`The contents of this repo are a proof of concept and are for educational use only`</em></strong>![alt text][1.1]<br/>
+
+ProtoDecodeUI is a Tool to help analyze incoming and outgoing game data for Pokemon GO. 
 
 ### Support
 Supports Decoding Requests and Response Messages
 
 ```
-Default Port: 8081
+Default Port: 8081 (seen config file)
 Request Route: /debug
 Response Route: /raw
 Web Interface to View Protos: /
 Traffic Route mode /traffic
+Golbat Route mode /golbat
 
 
 Web Interface: 
@@ -58,10 +63,26 @@ interface CombinedMessage {
 }
 ```
 
+### Support for Golbat interfaces
+**Sent to** `/golbat`
+
+```js
+interface CombinedMessage {
+    username: string 
+    trainerlvl?: number
+    contents : [
+        {
+            method: number,
+            data: string
+        }
+    ]
+}
+```
+
 ### Requirements
 
 ```
-Node 16 + (Tested on as low as version 16.14.0
+Node 16 + (Tested on as low as version 16.14.0)
 Yarn or NPM package manager
 ```
 
@@ -77,7 +98,7 @@ cd ./ProtoDecoderUI
 **Copy and adjust config file**
 ```bash
 # Copy the config.json file
-cp example.config.json config.json
+cp config/example.config.json config/config.json
 ```
 
 Yarn setup:

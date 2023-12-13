@@ -18,7 +18,47 @@ const portBind = config["default_port"];
 const httpServer = http.createServer(function (req, res) {
     let incomingData: Array<Buffer> = [];
     switch (req.url) {
-        case "/traffic":
+        case "/golbat":
+            req.on("data", function (chunk) {
+                incomingData.push(chunk);
+            });
+            req.on("end", function () {
+                const requestData = incomingData.join("");
+                let parsedData = JSON.parse(requestData);
+                res.writeHead(200, { "Content-Type": "application/json" });
+                res.end("");
+                const identifier = parsedData['username'];
+                for (let i = 0; i < parsedData['contents'].length; i++) {
+                    const parsedRequestData = decodePayloadTraffic(
+                        parsedData['contents'][i].type,
+                        parsedData['contents'][i].request,
+                        "request"
+                    );
+                    if (typeof parsedRequestData === "string") {
+                        incomingProtoWebBufferInst.write({ error: parsedRequestData });
+                    } else {
+                        for (let parsedObject of parsedRequestData) {
+                            parsedObject.identifier = identifier;
+                            incomingProtoWebBufferInst.write(parsedObject);
+                        }
+                    }
+                    const parsedResponseData = decodePayloadTraffic(
+                        parsedData['contents'][i].type,
+                        parsedData['contents'][i].payload,
+                        "response"
+                    );
+                    if (typeof parsedResponseData === "string") {
+                        outgoingProtoWebBufferInst.write({ error: parsedResponseData });
+                    } else {
+                        for (let parsedObject of parsedResponseData) {
+                            parsedObject.identifier = identifier;
+                            outgoingProtoWebBufferInst.write(parsedObject);
+                        }
+                    }
+                }
+            });
+            break;
+       case "/traffic":
             req.on("data", function (chunk) {
                 incomingData.push(chunk);
             });
