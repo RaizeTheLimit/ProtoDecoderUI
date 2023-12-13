@@ -28,7 +28,7 @@ export function getIPAddress() {
     return '0.0.0.0';
 }
 
-export function redirect_post(url_rediret: string, redirect_data: any) {
+export function redirect_post_golbat(url_rediret: string, redirect_data: any) {
     const url = parse(url_rediret);
     const request = http.request({
         method: "POST",
@@ -39,7 +39,7 @@ export function redirect_post(url_rediret: string, redirect_data: any) {
         port: url.port,
         path: url.path
     });
-    request.write(JSON.stringify(redirect_data));
+    request.write(redirect_data);
     request.end();
 }
 
