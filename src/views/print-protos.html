@@ -1,204 +1,159 @@
-<html>
-  <head>
-    <meta content="text/html;charset=utf-8" http-equiv="Content-Type" />
-    <meta content="utf-8" http-equiv="encoding" />
-    <link rel="stylesheet" type="text/css" href="css/style.css" />
+<!DOCTYPE html>
+<html lang="en">
 
-    <script
-      src="https://code.jquery.com/jquery-3.4.1.min.js"
-      integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
-      crossorigin="anonymous"
-    ></script>
-    <link
-      rel="stylesheet"
-      type="text/css"
-      href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
-    />
-    <script
-      type="text/javascript"
-      src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"
-    ></script>
-    <script src="https://kit.fontawesome.com/13b744953d.js"></script>
-    <script src="/socket.io/socket.io.js"></script>
+<head>
+  <meta content="text/html;charset=utf-8" http-equiv="Content-Type" />
+  <meta content="utf-8" http-equiv="encoding" />
+  <link rel="stylesheet" type="text/css" href="css/style.css" />
+  <link rel="stylesheet" type="text/css" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" />
 
-    <script src="json-viewer/jquery.json-viewer.js"></script>
-    <link
-      href="json-viewer/jquery.json-viewer.css"
-      type="text/css"
-      rel="stylesheet"
-    />
-  </head>
+  <script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+  <link rel="stylesheet" type="text/css" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" />
+  <script type="text/javascript" src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"></script>
+  <script src="https://kit.fontawesome.com/13b744953d.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
 
-  <body class="p-2">
-    <div class="container-fluid">
-      <div class="row">
-        <div class="col">
-          <div class="card">
-            <h4 class="card-header">
-              <div class="float-left align-middle">Proto's</div>
-              <div class="float-right align-middle">
-                <i class="fas fa-play" id="play-button"></i>
-                <i class="fas fa-pause" id="pause-button"></i>
-                <i class="fas fa-trash" id="clear-button"></i>
+  <script src="json-viewer/jquery.json-viewer.js"></script>
+  <link href="json-viewer/jquery.json-viewer.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"></script>
+</head>
+
+<body class="p-2">
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col">
+        <div class="card">
+          <h4 class="card-header text-center">
+              <button id="theme-toggle-button" class="btn btn-primary btn-sm">Toggle Theme</button>
+            <div class="float-left align-middle" style="font-size: 25px;">ProtoDecoderUI Proto's</div>
+            <div class="float-right align-middle">
+              <button id="play-button" class="btn btn-primary btn-sm"></button>
+              <button id="pause-button" class="btn btn-primary btn-sm"></button>
+              <button id="clear-button" class="btn btn-primary btn-sm"></button>
+            </div>
+          </h4>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-12">Filters</div>
+              <div class="col-md-12">
+                <label for="instance-filter">Instance</label>
+                <input type="text" id="instance-filter" placeholder="Instance name" />
+                <label for="instance-filter-dropdown">Found Instances:</label>
+                <select id="instance-filter-dropdown">
+                  <option value=""></option>
+                </select>
               </div>
-            </h4>
-            <div class="card-body">
-              <div class="row">
-                <div class="col-md-12">Filters</div>
-                <div class="col-md-12">
-                  <label for="instance-filter">Instance</label>
-                  <input
-                    type="text"
-                    id="instance-filter"
-                    placeholder="Instance name"
-                  />
-                  <label for="instance-filter-dropdown">Found Instances:</label>
-                  <select id="instance-filter-dropdown">
-                    <option value=""></option>
-                  </select>
-                </div>
-              </div>
+            </div>
 
-              <div class="row">
-                <div class="col-md-6">
-                  <div class="row">
-                    <div class="col-md-6">
-                      <div>
-                        <label>Blacklist Methods</label>
-                      </div>
-                      <div>
-                        <input
-                          type="text"
-                          id="blacklist-ids-incoming"
-                          value=""
-                          style="width: 100%"
-                        />
-                      </div>
+            <div class="row">
+              <div class="col-md-6">
+                <div class="row">
+                  <div class="col-md-6">
+                    <div>
+                      <label for="blacklist-ids-incoming">Blacklist Methods</label>
                     </div>
-                    <div class="col-md-6">
-                      <div>
-                        <label>Whitelist Methods</label>
-                      </div>
-                      <div>
-                        <input
-                          type="text"
-                          id="whitelist-ids-incoming"
-                          value=""
-                          style="width: 100%"
-                        />
-                      </div>
+                    <div>
+                      <input type="text" id="blacklist-ids-incoming" value="" style="width: 100%" />
                     </div>
                   </div>
-                </div>
-                <div class="col-md-6">
-                  <div class="row">
-                    <div class="col-md-6">
-                      <div>
-                        <label>Blacklist Methods</label>
-                      </div>
-                      <div>
-                        <input
-                          type="text"
-                          id="blacklist-ids-outgoing"
-                          value=""
-                          style="width: 100%"
-                        />
-                      </div>
+                  <div class="col-md-6">
+                    <div>
+                      <label for="whitelist-ids-incoming">Whitelist Methods</label>
                     </div>
-                    <div class="col-md-6">
-                      <div>
-                        <label>Whitelist Methods</label>
-                      </div>
-                      <div>
-                        <input
-                          type="text"
-                          id="whitelist-ids-outgoing"
-                          value=""
-                          style="width: 100%"
-                        />
-                      </div>
+                    <div>
+                      <input type="text" id="whitelist-ids-incoming" value="" style="width: 100%" />
                     </div>
                   </div>
                 </div>
               </div>
+              <div class="col-md-6">
+                <div class="row">
+                  <div class="col-md-6">
+                    <div>
+                      <label for="blacklist-ids-outgoing">Blacklist Methods</label>
+                    </div>
+                    <div>
+                      <input type="text" id="blacklist-ids-outgoing" value="" style="width: 100%" />
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div>
+                      <label for="whitelist-ids-outgoing">Whitelist Methods</label>
+                    </div>
+                    <div>
+                      <input type="text" id="whitelist-ids-outgoing" value="" style="width: 100%" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
 
-              <div class="row">
-                <div class="col-md-6">
-                  <div style="width: 100%">Incoming</div>
-                  <table
-                    id="incoming"
-                    class="table table-striped table-hover table-bordered rounded-lg"
-                    style="width: 100%"
-                  >
-                    <thead>
-                      <tr>
-                        <th>Instance</th>
-                        <th>Method</th>
-                        <th>Method Name</th>
-                        <th>Sended Data</th>
-                      </tr>
-                    </thead>
-                    <tbody></tbody>
-                  </table>
-                </div>
-                <div class="col-md-6">
-                  <div style="width: 100%">Outgoing</div>
-                  <table
-                    id="outgoing"
-                    class="table table-striped table-hover table-bordered rounded-lg"
-                    style="width: 100%"
-                  >
-                    <thead>
-                      <tr>
-                        <th>Instance</th>
-                        <th>Method</th>
-                        <th>Method Name</th>
-                        <th>Received Data</th>
-                      </tr>
-                    </thead>
-                    <tbody></tbody>
-                  </table>
-                </div>
+            <div class="row">
+              <div class="col-md-6">
+                <div style="width: 100%">Incoming</div>
+                <table id="incoming" class="table table-striped table-hover table-bordered rounded-lg" style="width: 100%">
+                  <thead>
+                    <tr>
+                      <th style="color: red;">Instance</th>
+                      <th style="color: red;">Method</th>
+                      <th style="color: red;">Method Name</th>
+                      <th style="color: red;">Sended Data</th>
+                    </tr>
+                  </thead>
+                  <tbody></tbody>
+                </table>
+              </div>
+              <div class="col-md-6">
+                <div style="width: 100%">Outgoing</div>
+                <table id="outgoing" class="table table-striped table-hover table-bordered rounded-lg" style="width: 100%">
+                  <thead>
+                    <tr>
+                      <th style="color: red;">Instance</th>
+                      <th style="color: red;">Method</th>
+                      <th style="color: red;">Method Name</th>
+                      <th style="color: red;">Sended Data</th>
+                    </tr>
+                  </thead>
+                  <tbody></tbody>
+                </table>
               </div>
             </div>
           </div>
         </div>
       </div>
     </div>
+  </div>
 
-    <div id="modal-detail" class="modal" tabindex="-1" role="dialog">
-      <div class="modal-dialog" style="max-width: 1350px!important;" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title">
-              Method id: <span class="method-id"></span>
-            </h5>
-            <button
-              type="button"
-              class="close"
-              data-dismiss="modal"
-              aria-label="Close"
-            >
-              <span aria-hidden="true">&times;</span>
-            </button>
-          </div>
-          <div class="modal-body">
-            <p>Method name: <span class="method-name"></span></p>
-            <p>Data:</p>
-            <pre class="method-data"></pre>
-          </div>
-          <div class="modal-footer">
-            <button
-              type="button"
-              class="btn btn-secondary"
-              data-dismiss="modal"
-            >
-              Close
-            </button>
-          </div>
+  <div id="modal-detail" class="modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" style="max-width: 1350px!important;" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">
+            Method id: <span class="method-id"></span>
+          </h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <p>Method name: <span class="method-name"></span></p>
+          <p>Data:</p>
+          <pre class="method-data"></pre>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">
+            Close
+          </button>
         </div>
       </div>
     </div>
+  </div>
+  <!-- Fixed Footer -->
+  <footer class="footer fixed-bottom bg-light d-flex align-items-center">
+    <div class="container text-center">
+      <span class="text-muted" style="font-size: larger; color: black; font-weight: bold;">ProtoDecoderUI @2023</span>
+    </div>
+  </footer>
     <script>
       var STATE = 0;
       setStateOnButtons();
@@ -507,6 +462,28 @@
           })
         );
       }
+// Check the user's theme preference from localStorage
+const currentTheme = localStorage.getItem('theme');
+if (currentTheme) {
+  document.body.classList.add(currentTheme);
+} else {
+  // If no preference is set, use the default theme (light)
+  document.body.classList.add('light-theme');
+}
+
+// Toggle between light and dark themes when the button is clicked
+document.getElementById('theme-toggle-button').addEventListener('click', function () {
+  const body = document.body;
+  if (body.classList.contains('light-theme')) {
+    body.classList.remove('light-theme');
+    body.classList.add('dark-theme');
+    localStorage.setItem('theme', 'dark-theme');
+  } else {
+    body.classList.remove('dark-theme');
+    body.classList.add('light-theme');
+    localStorage.setItem('theme', 'light-theme');
+  }
+});
     </script>
   </body>
 </html>

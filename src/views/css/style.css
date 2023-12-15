@@ -1,5 +1,71 @@
-*{
-	margin: 0;
-	font-size: x-small;
-	font-family: Roboto,Arial,sans-serif;
+* {
+  margin: 0;
+  font-size: x-small;
+  font-family: Roboto, Arial, sans-serif;
+}
+
+/* Light Theme */
+body.light-theme {
+  background-color: #ffffff;
+  color: #000000;
+}
+
+/* Dark Theme */
+body.dark-theme {
+  background-color: #1a1a1a;
+  color: #ffffff;
+}
+/* Dark Theme for card */
+body.dark-theme .card {
+  background-color: #1a1a1a;
+  color: #ffffff;
+}
+/* Dark Theme for card header */
+body.dark-theme h4.card-header.text-center {
+  background-color: #1a1a1a;
+  color: #ffffff;
+}
+body.dark-theme .card-body {
+  background-color: #1a1a1a; 
+  color: #ffffff;
+}
+/* Define background colors for odd and even rows in the tables */
+#incoming tbody tr:nth-child(odd) {
+  background-color: #e6f7ff; /* Light blue for odd rows in Incoming table */
+}
+
+#incoming tbody tr:nth-child(even) {
+  background-color: #d9ebff; /* Lighter blue for even rows in Incoming table */
+}
+
+#outgoing tbody tr:nth-child(odd) {
+  background-color: #ffe6e6; /* Light red for odd rows in Outgoing table */
+}
+
+#outgoing tbody tr:nth-child(even) {
+  background-color: #ffcccc; /* Lighter red for even rows in Outgoing table */
+}
+
+/* Add custom styling if needed */
+
+#play-button,
+#pause-button,
+#clear-button {
+  width: 48px; /* Adjust the width and height as needed */
+  height: 48px;
+  /* Add any additional styling for the buttons here */
+
+  /* Set background images for buttons */
+}
+
+#play-button {
+  background-image: url('../icons/play.png');
+}
+
+#pause-button {
+  background-image: url('../icons/pause.png');
+}
+
+#clear-button {
+  background-image: url('../icons/stop.png');
 }
