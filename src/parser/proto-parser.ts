@@ -21,7 +21,7 @@ function DecoderInternalPayloadAsResponse(method: number, data: any): any {
         proto_tuple = Object.values(requestMessagesResponses)[i];
         const my_req = proto_tuple[0];
         if (my_req == method) {
-            if (proto_tuple[2] != null) {
+            if (proto_tuple[2] != null && b64Decode(data)) {
                 try {
                     result = proto_tuple[2].decode(b64Decode(data)).toJSON();
                     /*
@@ -93,7 +93,7 @@ export const decodeProto = (method: number, data: string, dataType: string): Dec
                         action_social = parsedData.action;
                         Object.values(requestMessagesResponses).forEach(val => {
                             let req: any = val;
-                            if (req[0] == action_social && req[1] != null && parsedData.payload) {
+                            if (req[0] == action_social && req[1] != null && parsedData.payload && b64Decode(parsedData.payload)) {
                                 parsedData.payload = req[1].decode(b64Decode(parsedData.payload)).toJSON();
                             }
                         });
@@ -112,7 +112,7 @@ export const decodeProto = (method: number, data: string, dataType: string): Dec
             if (foundMethod[2] != null && dataType === "response") {
                 try {
                     let parsedData = foundMethod[2].decode(b64Decode(data)).toJSON();
-                    if (foundMethod[0] == 5012 && action_social > 0) {
+                    if (foundMethod[0] == 5012 && action_social > 0 && parsedData.payload) {
                         parsedData.payload = DecoderInternalPayloadAsResponse(action_social, parsedData.payload);
                     }
                     returnObject = {
