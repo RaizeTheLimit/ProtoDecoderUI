@@ -155,6 +155,11 @@ const httpServer = http.createServer(function (req, res) {
                 }
             });
             break;
+        case "/images/favicon.png":
+            res.writeHead(200, { "Content-Type": "image/png" });
+            const favicon = fs.readFileSync("./dist/views/images/favicon.png");
+            res.end(favicon);
+            break;
         case "/css/style.css":
             res.writeHead(200, { "Content-Type": "text/css" });
             const pageCssL = fs.readFileSync("./dist/views/css/style.css");
