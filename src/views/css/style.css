@@ -3,7 +3,12 @@
   font-size: x-small;
   font-family: Roboto, Arial, sans-serif;
 }
-
+/* Add custom CSS styles for the Toggle Theme button */
+#theme-toggle-button {
+  width: 70px;
+  height: 31px;
+}
+    </style>
 /* Light Theme */
 body.light-theme {
   background-color: #ffffff;
@@ -51,8 +56,8 @@ body.dark-theme .card-body {
 #play-button,
 #pause-button,
 #clear-button {
-  width: 48px; /* Adjust the width and height as needed */
-  height: 48px;
+  width: 31px; /* Adjust the width and height as needed */
+  height: 31px;
   /* Add any additional styling for the buttons here */
 
   /* Set background images for buttons */

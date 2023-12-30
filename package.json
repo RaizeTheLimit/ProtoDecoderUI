@@ -5,7 +5,7 @@
   "main": "dist/index.js",
   "scripts": {
     "start": "node dist/index.js",
-"build": "rimraf dist/ && tsc && copyfiles -u 1 src/**/*.html src/**/*.css src/**/*.json src/views/icons/* dist/"
+    "build": "rimraf dist/ && tsc && copyfiles -u 1 src/**/*.html src/**/*.css src/**/*.json src/**/*.png dist/"
   },
   "repository": {
     "type": "git",
