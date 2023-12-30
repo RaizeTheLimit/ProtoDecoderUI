@@ -21,7 +21,7 @@ function DecoderInternalPayloadAsResponse(method: number, data: any): any {
         proto_tuple = Object.values(requestMessagesResponses)[i];
         const my_req = proto_tuple[0];
         if (my_req == method) {
-            if (proto_tuple[2] != null && data && b64Decode(data)) {
+            if (proto_tuple[2] != null && b64Decode(data)) {
                 try {
                     result = proto_tuple[2].decode(b64Decode(data)).toJSON();
                     /*
@@ -33,7 +33,7 @@ function DecoderInternalPayloadAsResponse(method: number, data: any): any {
                     */
                 }
                 catch (error) {
-                    console.log(`Intenal ProxySocial decoder ${my_req} Error: ${error}`);
+                    console.error(`Intenal ProxySocial decoder ${my_req} Error: ${error}`);
                     let err = {
                         Error: error,
                         Data: data
@@ -93,7 +93,7 @@ export const decodeProto = (method: number, data: string, dataType: string): Dec
                         action_social = parsedData.action;
                         Object.values(requestMessagesResponses).forEach(val => {
                             let req: any = val;
-                            if (req[0] == action_social && req[1] != null && parsedData.payload) {
+                            if (req[0] == action_social && req[1] != null && parsedData.payload && b64Decode(parsedData.payload)) {
                                 parsedData.payload = req[1].decode(b64Decode(parsedData.payload)).toJSON();
                             }
                         });
@@ -104,15 +104,15 @@ export const decodeProto = (method: number, data: string, dataType: string): Dec
                         data: parsedData,
                     };
                 } catch (error) {
-                    console.log(`Error parsing request ${foundMethodString} `);
+                    console.error(`Error parsing request ${foundMethodString} -> ${error}`);
                 }
             } else if (dataType === "request") {
-                console.log(`Request ${foundMethod[0]} Not Implemented`)
+                console.warn(`Request ${foundMethod[0]} Not Implemented`)
             }
             if (foundMethod[2] != null && dataType === "response") {
                 try {
                     let parsedData = foundMethod[2].decode(b64Decode(data)).toJSON();
-                    if (foundMethod[0] == 5012 && action_social > 0) {
+                    if (foundMethod[0] == 5012 && action_social > 0 && parsedData.payload) {
                         parsedData.payload = DecoderInternalPayloadAsResponse(action_social, parsedData.payload);
                     }
                     returnObject = {
@@ -121,10 +121,10 @@ export const decodeProto = (method: number, data: string, dataType: string): Dec
                         data: parsedData,
                     };
                 } catch (error) {
-                    console.log(`Error parsing response ${foundMethodString} `);
+                    console.error(`Error parsing response ${foundMethodString} -> ${error}`);
                 }
             } else if (dataType === "response") {
-                console.log(`Response ${foundMethod[0]} Not Implemented`)
+                console.warn(`Response ${foundMethod[0]} Not Implemented`)
             }
         }
     }
