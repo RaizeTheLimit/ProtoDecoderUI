@@ -5,19 +5,19 @@
   <meta content="text/html;charset=utf-8" http-equiv="Content-Type" />
   <meta content="utf-8" http-equiv="encoding" />
   <link rel="stylesheet" type="text/css" href="css/style.css" />
-<!-- Favicon -->
-    <link rel="icon" type="image/png" href="images/favicon.png">
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="icon" href="images/favicon.png" />
+  <link rel="apple-touch-icon" href="images/favicon.png" />
+  <title>ProtoDecoderUI</title>
   <link rel="stylesheet" type="text/css" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" />
   <script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
   <script type="text/javascript" src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"></script>
   <script src="https://kit.fontawesome.com/13b744953d.js"></script>
   <script src="/socket.io/socket.io.js"></script>
-
   <script src="json-viewer/jquery.json-viewer.js"></script>
   <link href="json-viewer/jquery.json-viewer.css" type="text/css" rel="stylesheet" />
   <script type="text/javascript" src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"></script>
 </head>
-
 <body class="p-2">
   <div class="container-fluid">
     <div class="row">
@@ -31,92 +31,94 @@
               <button id="pause-button" class="btn btn-primary btn-sm"></button>
               <button id="clear-button" class="btn btn-primary btn-sm"></button>
             </div>
-          </h4>
-          <div class="card-body">
-            <div class="row">
-              <div class="col-md-12">Filters</div>
-              <div class="col-md-12">
-                <label for="instance-filter">Instance</label>
-                <input type="text" id="instance-filter" placeholder="Instance name" />
-                <label for="instance-filter-dropdown">Found Instances:</label>
-                <select id="instance-filter-dropdown">
-                  <option value=""></option>
-                </select>
-              </div>
-            </div>
-
-            <div class="row">
-              <div class="col-md-6">
+		  </h4>
+          <div class="container">
+            <div class="card mx-auto mt-5" style="width: 50%;">
+              <div class="card-body text-center">
                 <div class="row">
-                  <div class="col-md-6">
-                    <div>
-                      <label for="blacklist-ids-incoming">Blacklist Methods</label>
-                    </div>
-                    <div>
-                      <input type="text" id="blacklist-ids-incoming" value="" style="width: 100%" />
-                    </div>
-                  </div>
-                  <div class="col-md-6">
-                    <div>
-                      <label for="whitelist-ids-incoming">Whitelist Methods</label>
-                    </div>
-                    <div>
-                      <input type="text" id="whitelist-ids-incoming" value="" style="width: 100%" />
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div class="col-md-6">
-                <div class="row">
-                  <div class="col-md-6">
-                    <div>
-                      <label for="blacklist-ids-outgoing">Blacklist Methods</label>
-                    </div>
-                    <div>
-                      <input type="text" id="blacklist-ids-outgoing" value="" style="width: 100%" />
-                    </div>
-                  </div>
-                  <div class="col-md-6">
-                    <div>
-                      <label for="whitelist-ids-outgoing">Whitelist Methods</label>
-                    </div>
-                    <div>
-                      <input type="text" id="whitelist-ids-outgoing" value="" style="width: 100%" />
-                    </div>
+                  <div class="col-md-12">Filters</div>
+                  <div class="col-md-12">
+                    <label for="instance-filter">Instance</label>
+                    <input type="text" id="instance-filter" placeholder="Instance name" />
+                    <label for="instance-filter-dropdown">Instances Found:</label>
+                    <select id="instance-filter-dropdown">
+                      <option value=""></option>
+                    </select>
                   </div>
                 </div>
               </div>
             </div>
-
-            <div class="row">
-              <div class="col-md-6">
-                <div style="width: 100%">Incoming</div>
-                <table id="incoming" class="table table-striped table-hover table-bordered rounded-lg" style="width: 100%">
-                  <thead>
-                    <tr>
-                      <th style="color: red;">Instance</th>
-                      <th style="color: red;">Method</th>
-                      <th style="color: red;">Method Name</th>
-                      <th style="color: red;">Sended Data</th>
-                    </tr>
-                  </thead>
-                  <tbody></tbody>
-                </table>
+          </div>
+          <div class="row">
+            <div class="col-md-6">
+              <div class="row">
+                <div class="col-md-6">
+                  <div>
+                    <label for="blacklist-ids-incoming">Blacklist Methods</label>
+                  </div>
+                  <div>
+                    <input type="text" id="blacklist-ids-incoming" value="" style="width: 100%" />
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div>
+                    <label for="whitelist-ids-incoming">Whitelist Methods</label>
+                  </div>
+                  <div>
+                    <input type="text" id="whitelist-ids-incoming" value="" style="width: 100%" />
+                  </div>
+                </div>
               </div>
-              <div class="col-md-6">
-                <div style="width: 100%">Outgoing</div>
-                <table id="outgoing" class="table table-striped table-hover table-bordered rounded-lg" style="width: 100%">
-                  <thead>
-                    <tr>
-                      <th style="color: red;">Instance</th>
-                      <th style="color: red;">Method</th>
-                      <th style="color: red;">Method Name</th>
-                      <th style="color: red;">Sended Data</th>
-                    </tr>
-                  </thead>
-                  <tbody></tbody>
-                </table>
+            </div>
+            <div class="col-md-6">
+              <div class="row">
+                <div class="col-md-6">
+                  <div>
+                    <label for="blacklist-ids-outgoing">Blacklist Methods</label>
+                  </div>
+                  <div>
+                    <input type="text" id="blacklist-ids-outgoing" value="" style="width: 100%" />
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div>
+                    <label for="whitelist-ids-outgoing">Whitelist Methods</label>
+                  </div>
+                  <div>
+                    <input type="text" id="whitelist-ids-outgoing" value="" style="width: 100%" />
+                  </div>
+                </div>
               </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-6">
+              <div style="width: 100%">Incoming</div>
+              <table id="incoming" class="table table-striped table-hover table-bordered rounded-lg" style="width: 100%">
+                <thead>
+                  <tr>
+                    <th style="color: red;">Instance</th>
+                    <th style="color: red;">Method</th>
+                    <th style="color: red;">Method Name</th>
+                    <th style="color: red;">Sended Data</th>
+                  </tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+            </div>
+            <div class="col-md-6">
+              <div style="width: 100%">Outgoing</div>
+              <table id="outgoing" class="table table-striped table-hover table-bordered rounded-lg" style="width: 100%">
+                <thead>
+                  <tr>
+                    <th style="color: red;">Instance</th>
+                    <th style="color: red;">Method</th>
+                    <th style="color: red;">Method Name</th>
+                    <th style="color: red;">Sended Data</th>
+                  </tr>
+                </thead>
+                <tbody></tbody>
+              </table>
             </div>
           </div>
         </div>
@@ -129,15 +131,15 @@
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title">
-            Method id: <span class="method-id"></span>
+            <span style="color: Black;">Method id: <span class="method-id"></span>
           </h5>
           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
         <div class="modal-body">
-          <p>Method name: <span class="method-name"></span></p>
-          <p>Data:</p>
+          <p style="color: Black;">Method name: <span class="method-name"></span></p>
+          <p style="color: Black;">Data:</p>
           <pre class="method-data"></pre>
         </div>
         <div class="modal-footer">
@@ -148,7 +150,6 @@
       </div>
     </div>
   </div>
-  <!-- Fixed Footer -->
   <footer class="footer fixed-bottom bg-light d-flex align-items-center">
     <div class="container text-center">
       <span class="text-muted" style="font-size: larger; color: black; font-weight: bold;">ProtoDecoderUI @2023</span>
