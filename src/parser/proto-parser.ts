@@ -50,11 +50,15 @@ function DecoderInternalPayloadAsResponse(method: number, data: any): any {
 function remasterOrCleanMethodString(str: string) {
     return str.replace(/^REQUEST_TYPE_/, '')
         .replace(/^METHOD_/, '')
-        .replace(/^CLIENT_ACTION_/, '')
+        .replace(/^PLATFORM_/, '')
         .replace(/^SOCIAL_ACTION_/, '')
         .replace(/^GAME_ANTICHEAT_ACTION_/, '')
-        .replace(/^GAME_ACTION_/, '')
-        .replace(/^PLAYER_SUBMISSION_ACTION_/, '');
+        .replace(/^GAME_BACKGROUND_MODE_ACTION_/, '')
+        .replace(/^GAME_IAP_ACTION_/, '')
+        .replace(/^GAME_LOCATION_AWARENESS_ACTION_/, '')
+        .replace(/^GAME_ACCOUNT_REGISTRY_ACTION_/, '')
+        .replace(/^GAME_FITNESS_ACTION_/, '')
+        .replace(/^TITAN_PLAYER_SUBMISSION_ACTION_/, '');
 }
 
 export const decodePayloadTraffic = (methodId: number, content: any, dataType: string): DecodedProto[] => {
