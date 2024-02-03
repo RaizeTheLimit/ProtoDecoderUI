@@ -311,6 +311,7 @@ export const requestMessagesResponses = {
 	REQUEST_TYPE_METHOD_CONSUME_PARTY_ITEMS: [3006, POGOProtos.Rpc.ConsumePartyItemsProto, POGOProtos.Rpc.ConsumePartyItemsOutProto],
 	REQUEST_TYPE_METHOD_REMOVE_PTC_LOGIN: [3007, POGOProtos.Rpc.RemovePtcLoginActionProto, POGOProtos.Rpc.RemovePtcLoginActionOutProto],
 	REQUEST_TYPE_METHOD_SEND_PARTY_PLAY_INVITE: [3008, POGOProtos.Rpc.SendPartyInvitationProto, POGOProtos.Rpc.SendPartyInvitationOutProto],
+	REQUEST_TYPE_METHOD_CONSUME_STICKERS: [3009, POGOProtos.Rpc.ConsumeStickersProto, POGOProtos.Rpc.ConsumeStickersOutProto],
 	REQUEST_TYPE_PLATFORM_REGISTER_PUSH_NOTIFICATION: [5000, POGOProtos.Rpc.PushNotificationRegistryProto, POGOProtos.Rpc.PushNotificationRegistryOutProto],
 	REQUEST_TYPE_PLATFORM_UNREGISTER_PUSH_NOTIFICATION: [5001, null, null],
 	REQUEST_TYPE_PLATFORM_UPDATE_NOTIFICATION_STATUS: [5002, POGOProtos.Rpc.UpdateNotificationProto, POGOProtos.Rpc.UpdateNotificationOutProto],
