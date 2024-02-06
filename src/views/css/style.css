@@ -3,3 +3,49 @@
 	font-size: x-small;
 	font-family: Roboto,Arial,sans-serif;
 }
+
+table tr td {
+	word-break: break-all;
+}
+
+.card-header {
+	display: flex;
+	align-items: center;
+
+	.title-proto {
+		font-size: 20px;
+		font-weight: bold;
+	}
+	
+	.icons {
+		margin-left: auto
+	}
+
+	.icons i {
+		font-size: 15px;
+		margin-right: 10px;
+		opacity: 0.8;
+		transition-duration: 0.5s;
+	}
+	
+	.icons i:hover {
+		cursor: pointer;
+		opacity: 1;
+	}
+	
+	.icons i:last-child {
+		margin-right: 0;
+	}
+}
+
+.footer {
+	position: fixed;
+	bottom: 0;
+	left: 0;
+	padding: 10px;
+	background-color: rgba(0, 0, 0, 0.7);
+	color: #FFF;
+	text-align: right;
+	border-top: 2px solid rgba(255, 255, 255, 0.5);
+	width: 100%;
+}

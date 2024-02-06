@@ -37,11 +37,11 @@
   <body class="p-2">
     <div class="container-fluid">
       <div class="row">
-        <div class="col">
+        <div class="col" style="padding-bottom: 40px">
           <div class="card">
             <h4 class="card-header">
-              <div class="float-left align-middle">Proto's</div>
-              <div class="float-right align-middle">
+              <div class="title-proto">ProtoDecoderUI</div>
+              <div class="icons">
                 <i class="fas fa-play" id="play-button"></i>
                 <i class="fas fa-pause" id="pause-button"></i>
                 <i class="fas fa-trash" id="clear-button"></i>
@@ -65,75 +65,41 @@
               </div>
 
               <div class="row">
-                <div class="col-md-6">
-                  <div class="row">
-                    <div class="col-md-6">
-                      <div>
-                        <label for="blacklist-ids-incoming">Blacklist Methods</label>
-                      </div>
-                      <div>
-                        <input
-                          type="text"
-                          id="blacklist-ids-incoming"
-                          value=""
-                          style="width: 100%"
-                        />
-                      </div>
+                  <div class="col-sm">
+                    <div>
+                      <label for="blacklist-ids-incoming">Blacklist Methods</label>
                     </div>
-                    <div class="col-md-6">
-                      <div>
-                        <label for="whitelist-ids-incoming">Whitelist Methods</label>
-                      </div>
-                      <div>
-                        <input
-                          type="text"
-                          id="whitelist-ids-incoming"
-                          value=""
-                          style="width: 100%"
-                        />
-                      </div>
+                    <div>
+                      <input
+                        type="text"
+                        id="blacklist-ids-incoming"
+                        value=""
+                        style="width: 100%"
+                        placeholder="5026,1601,1103,..."
+                      />
                     </div>
                   </div>
-                </div>
-                <div class="col-md-6">
-                  <div class="row">
-                    <div class="col-md-6">
-                      <div>
-                        <label for="blacklist-ids-outgoing">Blacklist Methods</label>
-                      </div>
-                      <div>
-                        <input
-                          type="text"
-                          id="blacklist-ids-outgoing"
-                          value=""
-                          style="width: 100%"
-                        />
-                      </div>
+
+                  <div class="col-sm">
+                    <div>
+                      <label for="maxlogs">Maxlogs</label>
                     </div>
-                    <div class="col-md-6">
-                      <div>
-                        <label for="whitelist-ids-outgoing">Whitelist Methods</label>
-                      </div>
-                      <div>
-                        <input
-                          type="text"
-                          id="whitelist-ids-outgoing"
-                          value=""
-                          style="width: 100%"
-                        />
-                      </div>
+                    <div>
+                      <input
+                        type="number"
+                        id="maxlogs"
+                        value=""
+                        style="width: 100%"
+                        placeholder="150"
+                      />
                     </div>
                   </div>
-                </div>
               </div>
 
-              <div class="row">
-                <div class="col-md-6">
-                  <div style="width: 100%">Incoming</div>
-                  <table
-                    id="incoming"
+                <table
+                    id="data_socket"
                     class="table table-striped table-hover table-bordered rounded-lg"
-                    style="width: 100%"
+                    style="width: 100%; margin-top: 10px"
                   >
                     <thead>
                       <tr>
@@ -141,30 +107,12 @@
                         <th>Method</th>
                         <th>Method Name</th>
                         <th>Sended Data</th>
-                      </tr>
-                    </thead>
-                    <tbody></tbody>
-                  </table>
-                </div>
-                <div class="col-md-6">
-                  <div style="width: 100%">Outgoing</div>
-                  <table
-                    id="outgoing"
-                    class="table table-striped table-hover table-bordered rounded-lg"
-                    style="width: 100%"
-                  >
-                    <thead>
-                      <tr>
-                        <th>Instance</th>
-                        <th>Method</th>
-                        <th>Method Name</th>
                         <th>Received Data</th>
                       </tr>
                     </thead>
                     <tbody></tbody>
                   </table>
                 </div>
-              </div>
             </div>
           </div>
         </div>
@@ -172,7 +120,7 @@
     </div>
 
     <div id="modal-detail" class="modal" tabindex="-1" role="dialog">
-      <div class="modal-dialog" style="max-width: 1350px!important;" role="document">
+      <div class="modal-dialog" style="max-width: 80% !important;" role="document">
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title">
@@ -189,8 +137,10 @@
           </div>
           <div class="modal-body">
             <p>Method name: <span class="method-name"></span></p>
-            <p>Data:</p>
-            <pre class="method-data"></pre>
+            <p>Incoming data:</p>
+            <pre class="method-data-incoming"></pre>
+            <p>Outgoing data:</p>
+            <pre class="method-data-outgoing"></pre>
           </div>
           <div class="modal-footer">
             <button
@@ -204,21 +154,40 @@
         </div>
       </div>
     </div>
+
+    <div class="footer">ProtoDecoderUI - --=FurtiF™=-- 2024</div>
+
     <script>
+      class IncomingMessage {
+        constructor(id, obj) {
+          this.id = id;
+          this.data = obj.data;
+          this.identifier = obj.identifier;
+          this.methodId = obj.methodId;
+          this.methodName = obj.methodName;
+
+          this.responseHtmlElement = null;
+          this.response = null;
+        }
+
+        setResponse(obj) {
+          this.response = obj;
+        }
+      }
+
       var STATE = 0;
       setStateOnButtons();
 
       var incoming = io.connect("/incoming"),
         outgoing = io.connect("/outgoing");
 
+      let incomingProtocolId = 0;
+      let maxLogs = 100;
+      let messages = [];
       let foundInstances = [];
       let instanceFilter = "";
       let incomingBlacklistIds = [];
-      let incomingWhitelistIds = [];
-      let outgoingBlacklistIds = [];
-      let outgoingWhitelistIds = [];
 
-      let numberOfRowsIncoming = 0;
       incoming.on("protos", function (data) {
         if (foundInstances.indexOf(data.identifier) === -1) {
           foundInstances.push(data.identifier);
@@ -229,15 +198,11 @@
           return;
         }
 
-        if (instanceFilter !== "" && data.identifier !== instanceFilter) {
+        if (instanceFilter == "" || data.identifier !== instanceFilter) {
           return;
         }
 
-        if (incomingWhitelistIds.length > 0) {
-          if (incomingWhitelistIds.indexOf(data.methodId) === -1) {
-            return;
-          }
-        } else if (incomingBlacklistIds.length > 0) {
+        if (incomingBlacklistIds.length > 0) {
           if (incomingBlacklistIds.indexOf(data.methodId) !== -1) {
             return;
           }
@@ -246,28 +211,36 @@
         if (typeof data.error !== "undefined") {
           console.error(data.error);
         } else {
-          const tr = $(
-            `<tr><td class="instance-cell">${ 
-              data.identifier
-            }</td><td class="method-id-cell">${
-              data.methodId
-            }</td><td class="method-name-cell">${
-              data.methodName
-            }</td><td>${objectToReadable(data.data)}</td></tr>`
-          );
-          tr.data("fulldata", data.data);
+          incomingProtocolId++;
+          const message = new IncomingMessage(incomingProtocolId, data);
+          messages.push(message);
 
-          $("#incoming tbody").prepend(tr);
+          const tr = document.createElement("tr");
+          tr.setAttribute("id", message.id)
+          const parameters = ["identifier", "methodId", "methodName", "data", null];
 
-          numberOfRowsIncoming++;
-          if (numberOfRowsIncoming > 1000) {
-            $("#incoming tbody tr:last").remove();
-            numberOfRowsIncoming--;
-          }
+          parameters.forEach((el) => {
+            const td = document.createElement("td");
+            if(el != null) {
+              if(el == "data")
+                td.innerHTML = objectToReadable(message[el]);
+              else
+                td.innerText = message[el];
+            }
+            else {
+              td.innerText = "Waiting data..."
+              message.responseHtmlElement = td;
+            }
+            tr.appendChild(td);
+          });
+
+          $("#data_socket tbody").prepend(tr);
+          
+          if($("#data_socket tbody").children().length > maxLogs)
+            $("#data_socket tbody").children().last().remove()
         }
       });
 
-      let numberOfRowsOutgoing = 0;
       outgoing.on("protos", function (data) {
         if (foundInstances.indexOf(data.identifier) === -1) {
           foundInstances.push(data.identifier);
@@ -278,55 +251,39 @@
           return;
         }
 
-        if (outgoingWhitelistIds.length > 0) {
-          if (outgoingWhitelistIds.indexOf(data.methodId) === -1) {
-            return;
-          }
-        } else if (outgoingBlacklistIds.length > 0) {
-          if (outgoingBlacklistIds.indexOf(data.methodId) !== -1) {
+        if (incomingBlacklistIds.length > 0) {
+          if (incomingBlacklistIds.indexOf(data.methodId) !== -1) {
             return;
           }
         }
 
-        if (instanceFilter !== "" && data.identifier !== instanceFilter) {
+        if (instanceFilter == "" || data.identifier !== instanceFilter) {
           return;
         }
 
         if (typeof data.error !== "undefined") {
           console.error(data.error);
         } else {
-          const tr = $(
-            `<tr data-fulldata="${JSON.stringify(
-              data.data
-            )}"><td class="instance-cell">${ 
-              data.identifier
-            }</td><td class="method-id-cell">${
-              data.methodId
-            }</td><td class="method-name-cell">${
-              data.methodName
-            }</td><td class="data-cell">${objectToReadable(
-              data.data
-            )}</td></tr>`
-          );
-          tr.data("fulldata", data.data);
-          $("#outgoing tbody").prepend(tr);
+          const incomingMessage = messages.filter((message) => message.methodId == data.methodId && message.response == null)[0];
 
-          numberOfRowsOutgoing++;
-          if (numberOfRowsOutgoing > 1000) {
-            $("#outgoing tbody tr:last").remove();
-            numberOfRowsOutgoing--;
-          }
+          if(incomingMessage == null)
+            return console.error(`Impossible to get incoming message for response: [${data.methodId}} ${data.methodName}.`);
+
+          incomingMessage.response = data;
+          incomingMessage.responseHtmlElement.innerHTML = objectToReadable(data.data);
         }
       });
 
-      $("#incoming tbody,#outgoing tbody").on("click", "tr", function () {
-        let methodId = $(this).find(".method-id-cell").html();
-        let methodName = $(this).find(".method-name-cell").html();
-        let data = $(this).data("fulldata");
+      $("#data_socket tbody").on("click", "tr", function () {
+        const message = messages.filter((msg) => msg.id == $(this)[0].id)[0];
+        if(message == null)
+          return;
 
-        $("#modal-detail").find(".method-id").html(methodId);
-        $("#modal-detail").find(".method-name").html(methodName);
-        $("#modal-detail").find(".method-data").jsonViewer(data);
+        $("#modal-detail").find(".method-id").html(message.methodId);
+        $("#modal-detail").find(".method-name").html(message.methodName);
+        $("#modal-detail").find(".method-data-incoming").jsonViewer(message.data);
+        $("#modal-detail").find(".method-data-outgoing").jsonViewer(message.response);
+
         $("#modal-detail").modal();
       });
 
@@ -343,10 +300,13 @@
       });
 
       $("#clear-button").click(function () {
-        $("#incoming tbody tr,#outgoing tbody tr").remove();
-        numberOfRowsIncoming = 0;
-        numberOfRowsOutgoing = 0;
+        clearTable();
       });
+
+      function clearTable() {
+        $("#data_socket tbody tr").remove();
+        messages = [];
+      }
 
       function setStateOnButtons() {
         let id = "";
@@ -367,9 +327,13 @@
       }
 
       function appendFoundName(name) {
-        $("#instance-filter-dropdown").append(`<option value="${name}">
-           ${name}
-        </option>`);
+        const option = document.createElement("option");
+        option.setAttribute("name", name);
+        option.textContent = name;
+
+        $("#instance-filter-dropdown").append(option);
+        if(instanceFilter == name)
+          $("#instance-filter-dropdown").val(name);
       }
 
       function objectToReadable(object) {
@@ -407,6 +371,7 @@
       });
 
       $("#instance-filter").keyup(function () {
+        clearTable();
         instanceFilter = $(this).val();
         storeSettings();
       });
@@ -422,79 +387,35 @@
         storeSettings();
       });
 
-      $("#whitelist-ids-incoming").keyup(function () {
-        incomingWhitelistIds =
-          $(this).val() === ""
-            ? []
-            : $(this)
-                .val()
-                .split(",")
-                .map((x) => parseInt(x));
-        storeSettings();
+      $("#maxlogs").keyup(function () {
+        if(isNaN(parseInt($(this).val())))
+          return $(this).val("");
 
-        checkBlacklistIncomingWriteable();
-      });
-
-      $("#blacklist-ids-outgoing").keyup(function () {
-        outgoingBlacklistIds =
-          $(this).val() === ""
-            ? []
-            : $(this)
-                .val()
-                .split(",")
-                .map((x) => parseInt(x));
+        clearTable();
+        maxLogs = parseInt($(this).val());
         storeSettings();
       });
-
-      $("#whitelist-ids-outgoing").keyup(function () {
-        outgoingWhitelistIds =
-          $(this).val() === ""
-            ? []
-            : $(this)
-                .val()
-                .split(",")
-                .map((x) => parseInt(x));
-        storeSettings();
-
-        checkBlacklistOutgoingWriteable();
-      });
-
-      function checkBlacklistIncomingWriteable() {
-        if (incomingWhitelistIds.length > 0) {
-          $("#blacklist-ids-incoming").attr("readonly", "readonly");
-        } else {
-          $("#blacklist-ids-incoming").removeAttr("readonly");
-        }
-      }
-
-      function checkBlacklistOutgoingWriteable() {
-        if (outgoingWhitelistIds.length > 0) {
-          $("#blacklist-ids-outgoing").attr("readonly", "readonly");
-        } else {
-          $("#blacklist-ids-outgoing").removeAttr("readonly");
-        }
-      }
 
       function loadSettings() {
         let settingsJson = localStorage.getItem("settings");
         if (settingsJson !== null) {
           const settings = JSON.parse(settingsJson);
-          STATE = parseInt(settings["STATE"]);
-          instanceFilter = settings["instanceFilter"];
+          STATE = parseInt(settings["STATE"]),
+          instanceFilter = settings["instanceFilter"],
           incomingBlacklistIds = settings["incomingBlacklistIds"];
-          incomingWhitelistIds = settings["incomingWhitelistIds"];
-          outgoingBlacklistIds = settings["outgoingBlacklistIds"];
-          outgoingWhitelistIds = settings["outgoingWhitelistIds"];
+
+          if(settings["maxLogs"] != null && !isNaN(parseInt(maxLogs)))
+            maxLogs = parseInt(settings["maxLogs"]);
 
           if (STATE === 1) {
             $("#play-button").click();
           }
+
           $("#instance-filter").val(instanceFilter);
           $("#blacklist-ids-incoming").val(incomingBlacklistIds.join(","));
-          $("#blacklist-ids-outgoing").val(outgoingBlacklistIds.join(","));
-          $("#whitelist-ids-incoming").val(incomingWhitelistIds.join(","));
-          $("#whitelist-ids-outgoing").val(outgoingWhitelistIds.join(","));
         }
+
+        $("#maxlogs").val(maxLogs);
       }
 
       loadSettings();
@@ -506,9 +427,7 @@
             STATE: STATE,
             instanceFilter: instanceFilter,
             incomingBlacklistIds: incomingBlacklistIds,
-            incomingWhitelistIds: incomingWhitelistIds,
-            outgoingBlacklistIds: outgoingBlacklistIds,
-            outgoingWhitelistIds: outgoingWhitelistIds,
+            maxLogs: maxLogs
           })
         );
       }

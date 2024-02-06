@@ -194,6 +194,9 @@ var incoming = io.of("/incoming").on("connection", function (socket) {
         },
     };
     incomingProtoWebBufferInst.addReader(reader);
+    socket.on("error", function(err) {
+        console.log("WebSockets Error: ", err)
+    })
     socket.on("disconnect", function () {
         incomingProtoWebBufferInst.removeReader(reader);
     });
@@ -206,6 +209,9 @@ var outgoing = io.of("/outgoing").on("connection", function (socket) {
         },
     };
     outgoingProtoWebBufferInst.addReader(reader);
+    socket.on("error", function(err) {
+        console.log("WebSockets Error: ", err)
+    })
     socket.on("disconnect", function () {
         outgoingProtoWebBufferInst.removeReader(reader);
     });
