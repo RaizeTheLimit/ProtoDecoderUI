@@ -278,12 +278,10 @@
         const message = messages.filter((msg) => msg.id == $(this)[0].id)[0];
         if(message == null)
           return;
-
         $("#modal-detail").find(".method-id").html(message.methodId);
         $("#modal-detail").find(".method-name").html(message.methodName);
         $("#modal-detail").find(".method-data-incoming").jsonViewer(message.data);
-        $("#modal-detail").find(".method-data-outgoing").jsonViewer(message.response);
-
+        $("#modal-detail").find(".method-data-outgoing").jsonViewer(message.response.data);
         $("#modal-detail").modal();
       });
 
