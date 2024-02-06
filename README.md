@@ -112,6 +112,6 @@ yarn start
 
 ## Credits
 
- - FurtiF for putting in the hard work of supplying Protos with every release ❤️
-   If you would like to support him and future Proto Updates, please sponsor him on GitHub!
+ - [--=FurtiF™=-](https://github.com/sponsors/Furtif) for putting in the hard work of supplying Protos with every release ❤️
+   If you would like to support him and future Proto Updates, please [sponsor](https://github.com/sponsors/Furtif) him on GitHub!
   
