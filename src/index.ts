@@ -34,7 +34,7 @@ const httpServer = http.createServer(function (req, res) {
                     try {
                         redirect_post_golbat(config["redirect_to_golbat_url"], JSON.stringify(parsedData));
                     }
-                    catch(err) {
+                    catch (err) {
                         console.error("Endpoint golbat offline or bad!" + err);
                     }
                 }
@@ -199,7 +199,7 @@ var incoming = io.of("/incoming").on("connection", function (socket) {
         },
     };
     incomingProtoWebBufferInst.addReader(reader);
-    socket.on("error", function(err) {
+    socket.on("error", function (err) {
         console.log("WebSockets Error: ", err)
     })
     socket.on("disconnect", function () {
@@ -214,7 +214,7 @@ var outgoing = io.of("/outgoing").on("connection", function (socket) {
         },
     };
     outgoingProtoWebBufferInst.addReader(reader);
-    socket.on("error", function(err) {
+    socket.on("error", function (err) {
         console.log("WebSockets Error: ", err)
     })
     socket.on("disconnect", function () {
