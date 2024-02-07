@@ -31,7 +31,12 @@ const httpServer = http.createServer(function (req, res) {
                 // ex http://123.123.123.123:9001/raw
                 // this need a test ping ok or throw for better.
                 if (config["redirect_to_golbat_url"]) {
-                    redirect_post_golbat(config["redirect_to_golbat_url"], JSON.stringify(parsedData));
+                    try {
+                        redirect_post_golbat(config["redirect_to_golbat_url"], JSON.stringify(parsedData));
+                    }
+                    catch(err) {
+                        console.error("Endpoint golbat offline or bad!" + err);
+                    }
                 }
                 const identifier = parsedData['username'];
                 for (let i = 0; i < parsedData['contents'].length; i++) {
