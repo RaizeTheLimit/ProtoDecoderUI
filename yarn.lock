@@ -15,9 +15,9 @@
     wrap-ansi-cjs "npm:wrap-ansi@^7.0.0"
 
 "@na-ji/pogo-protos@<3.0.0":
-  version "2.113.0"
-  resolved "https://registry.yarnpkg.com/@na-ji/pogo-protos/-/pogo-protos-2.113.0.tgz#a729481aeca70d9c4e1062102017e5281582db51"
-  integrity sha512-u/2n0iCDeHZqrhJnz71CYrYVCQLbRxQ5MY6HaKILeaH6DVbuA5WxxtKzpBt2+Ov9tFKFpRyLuICSjB7kau6FqA==
+  version "2.114.0"
+  resolved "https://registry.yarnpkg.com/@na-ji/pogo-protos/-/pogo-protos-2.114.0.tgz#11e57bd7f97bc6c5480eda326d5441c5081f2011"
+  integrity sha512-5Z/LXjDx8A9EgCv8EKvmfeBi3s3XxB7Z0+pVjZ9QGYvCiw3X/zUl0vGyUxhpg6ISZVUqFDlkJM7/0q/JQBNS6Q==
   dependencies:
     protobufjs "^6.11.3"
 
@@ -102,9 +102,9 @@
   integrity sha512-MqTGEo5bj5t157U6fA/BiDynNkn0YknVdh48CMPkTSpFTVmvao5UQmm7uEF6xBEo7qIMAlY/JSleYaE6VOdpaA==
 
 "@types/node@*", "@types/node@>=10.0.0", "@types/node@>=13.7.0", "@types/node@^20.3.1":
-  version "20.11.16"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-20.11.16.tgz#4411f79411514eb8e2926f036c86c9f0e4ec6708"
-  integrity sha512-gKb0enTmRCzXSSUJDq6/sPcqrfCv2mkkG6Jt/clpn5eiCbKTY+SgZUxo+p8ZKMof5dCp9vHQUAB7wOUTod22wQ==
+  version "20.11.19"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-20.11.19.tgz#b466de054e9cb5b3831bee38938de64ac7f81195"
+  integrity sha512-7xMnVEcZFu0DikYjWOlRq7NTPETrm7teqUT2WkQjrTIkEgUyyGdWsj/Zg8bEJt5TNklzbPD1X3fqfsHw3SpapQ==
   dependencies:
     undici-types "~5.26.4"
 

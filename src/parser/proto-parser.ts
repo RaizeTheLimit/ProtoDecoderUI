@@ -93,7 +93,7 @@ export const decodeProto = (method: number, data: string, dataType: string): Dec
             if (foundMethod[1] != null && dataType === "request") {
                 try {
                     let parsedData = foundMethod[1].decode(b64Decode(data)).toJSON();
-                    if (foundMethod[0] == 5012) {
+                    if (foundMethod[0] === 5012 || foundMethod[0] === 600005) {
                         action_social = parsedData.action;
                         Object.values(requestMessagesResponses).forEach(val => {
                             let req: any = val;
@@ -116,7 +116,10 @@ export const decodeProto = (method: number, data: string, dataType: string): Dec
             if (foundMethod[2] != null && dataType === "response") {
                 try {
                     let parsedData = foundMethod[2].decode(b64Decode(data)).toJSON();
-                    if (foundMethod[0] == 5012 && action_social > 0 && parsedData.payload) {
+                    if (foundMethod[0] === 5012 && action_social > 0 && parsedData.payload) {
+                        parsedData.payload = DecoderInternalPayloadAsResponse(action_social, parsedData.payload);
+                    }
+                    else if (foundMethod[0] === 600005 && action_social > 0 && parsedData.payload) {
                         parsedData.payload = DecoderInternalPayloadAsResponse(action_social, parsedData.payload);
                     }
                     returnObject = {
