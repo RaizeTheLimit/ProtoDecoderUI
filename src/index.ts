@@ -32,7 +32,7 @@ const httpServer = http.createServer(function (req, res) {
                 // this need a test ping ok or throw for better.
                 if (config["redirect_to_golbat_url"]) {
                     try {
-                        redirect_post_golbat(config["redirect_to_golbat_url"], JSON.stringify(parsedData));
+                        redirect_post_golbat(config["redirect_to_golbat_url"], config["redirect_to_golbat_token"], JSON.stringify(parsedData));
                     }
                     catch (err) {
                         console.error("Endpoint golbat offline or bad!" + err);

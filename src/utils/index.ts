@@ -28,13 +28,17 @@ export function getIPAddress() {
     return '0.0.0.0';
 }
 
-export function redirect_post_golbat(url_redirect: string, redirect_data: any) {
-    const url = parse(url_redirect);
+export function redirect_post_golbat(redirect_url: string, redirect_token: string, redirect_data: any) {
+    const url = parse(redirect_url);
+    const headers = {
+        "Content-Type": "application/json"
+    };
+    if (redirect_token) {
+        headers["Authorization"] = "Bearer " + redirect_token;
+    }
     const request = http.request({
         method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
+        headers: headers,
         host: url.hostname,
         port: url.port,
         path: url.path
