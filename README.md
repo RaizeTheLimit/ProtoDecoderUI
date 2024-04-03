@@ -105,6 +105,7 @@ cp config/example.config.json config/config.json
 
 ### Yarn setup:
 ```bash
+npm install yarn -g
 yarn
 yarn build
 yarn start
