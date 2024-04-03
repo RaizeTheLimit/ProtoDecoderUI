@@ -103,7 +103,7 @@ cd ./ProtoDecoderUI
 cp config/example.config.json config/config.json
 ```
 
-Yarn setup:
+### Yarn setup:
 ```bash
 yarn
 yarn build
