@@ -8,7 +8,6 @@
     <link rel="apple-touch-icon" href="images/favicon.png" />
     <title>ProtoDecoderUI</title>
     <link rel="stylesheet" type="text/css" href="css/style.css" />
-
     <script
       src="https://code.jquery.com/jquery-3.4.1.min.js"
       integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
@@ -33,7 +32,6 @@
       rel="stylesheet"
     />
   </head>
-
   <body class="p-2">
     <div class="container-fluid">
       <div class="row">
@@ -63,7 +61,6 @@
                   </select>
                 </div>
               </div>
-
               <div class="row">
                 <div class="col-sm">
                   <div>
@@ -81,7 +78,6 @@
                     />
                   </div>
                 </div>
-
                 <div class="col-sm">
                   <div>
                     <label for="maxlogs">Maxlogs</label>
@@ -97,7 +93,6 @@
                   </div>
                 </div>
               </div>
-
               <table
                 id="data_socket"
                 class="table table-striped table-hover table-bordered rounded-lg"
@@ -119,7 +114,6 @@
         </div>
       </div>
     </div>
-
     <div id="modal-detail" class="modal" tabindex="-1" role="dialog">
       <div
         class="modal-dialog"
@@ -159,7 +153,6 @@
         </div>
       </div>
     </div>
-
     <div class="footer">
       <a href="https://github.com/RaizeTheLimit/ProtoDecoderUI" target="_blank"
         >ProtoDecoderUI</a
@@ -168,7 +161,6 @@
       <a href="https://github.com/Furtif" target="_blank">--=FurtiF™=--</a>
       ©2016-2024
     </div>
-
     <script>
       class IncomingMessage {
         constructor(id, obj) {
@@ -177,56 +169,45 @@
           this.identifier = obj.identifier;
           this.methodId = obj.methodId;
           this.methodName = obj.methodName;
-
           this.responseHtmlElement = null;
           this.response = null;
         }
-
         setResponse(obj) {
           this.response = obj;
         }
       }
-
       var STATE = 0;
       setStateOnButtons();
-
       var incoming = io.connect("/incoming"),
         outgoing = io.connect("/outgoing");
-
       let incomingProtocolId = 0;
       let maxLogs = 100;
       let messages = [];
       let foundInstances = [];
       let instanceFilter = "";
       let incomingBlacklistIds = [];
-
       incoming.on("protos", function (data) {
         if (foundInstances.indexOf(data.identifier) === -1) {
           foundInstances.push(data.identifier);
           appendFoundName(data.identifier);
         }
-
         if (STATE !== 1) {
           return;
         }
-
         if (instanceFilter == "" || data.identifier !== instanceFilter) {
           return;
         }
-
         if (incomingBlacklistIds.length > 0) {
           if (incomingBlacklistIds.indexOf(data.methodId) !== -1) {
             return;
           }
         }
-
         if (typeof data.error !== "undefined") {
           console.error(data.error);
         } else {
           incomingProtocolId++;
           const message = new IncomingMessage(incomingProtocolId, data);
           messages.push(message);
-
           const tr = document.createElement("tr");
           tr.setAttribute("id", message.id);
           const parameters = [
@@ -236,7 +217,6 @@
             "data",
             null,
           ];
-
           parameters.forEach((el) => {
             const td = document.createElement("td");
             if (el != null) {
@@ -248,34 +228,27 @@
             }
             tr.appendChild(td);
           });
-
           $("#data_socket tbody").prepend(tr);
-
           if ($("#data_socket tbody").children().length > maxLogs)
             $("#data_socket tbody").children().last().remove();
         }
       });
-
       outgoing.on("protos", function (data) {
         if (foundInstances.indexOf(data.identifier) === -1) {
           foundInstances.push(data.identifier);
           appendFoundName(data.identifier);
         }
-
         if (STATE !== 1) {
           return;
         }
-
         if (incomingBlacklistIds.length > 0) {
           if (incomingBlacklistIds.indexOf(data.methodId) !== -1) {
             return;
           }
         }
-
         if (instanceFilter == "" || data.identifier !== instanceFilter) {
           return;
         }
-
         if (typeof data.error !== "undefined") {
           console.error(data.error);
         } else {
@@ -283,19 +256,16 @@
             (message) =>
               message.methodId == data.methodId && message.response == null
           )[0];
-
           if (incomingMessage == null)
             return console.error(
               `Impossible to get incoming message for response: [${data.methodId}] ${data.methodName}.`
             );
-
           incomingMessage.response = data;
           incomingMessage.responseHtmlElement.innerHTML = objectToReadable(
             data.data
           );
         }
       });
-
       $("#data_socket tbody").on("click", "tr", function () {
         const message = messages.filter((msg) => msg.id == $(this)[0].id)[0];
         if (message == null) return;
@@ -309,28 +279,23 @@
           .jsonViewer(message.response.data);
         $("#modal-detail").modal();
       });
-
       $("#play-button").click(function () {
         STATE = 1;
         setStateOnButtons();
         storeSettings();
       });
-
       $("#pause-button").click(function () {
         STATE = 0;
         setStateOnButtons();
         storeSettings();
       });
-
       $("#clear-button").click(function () {
         clearTable();
       });
-
       function clearTable() {
         $("#data_socket tbody tr").remove();
         messages = [];
       }
-
       function setStateOnButtons() {
         let id = "";
         let idDisabled = "";
@@ -344,20 +309,16 @@
             idDisabled = "play-button";
             break;
         }
-
         $("#" + id).css("color", "#000000");
         $("#" + idDisabled).css("color", "#888888");
       }
-
       function appendFoundName(name) {
         const option = document.createElement("option");
         option.setAttribute("name", name);
         option.textContent = name;
-
         $("#instance-filter-dropdown").append(option);
         if (instanceFilter == name) $("#instance-filter-dropdown").val(name);
       }
-
       function objectToReadable(object) {
         let dataStrings = [];
         let numberOfRows = 0;
@@ -366,38 +327,30 @@
             dataStrings.push("...");
             break;
           }
-
           let value;
           if (typeof object[key] === "object") {
             value = JSON.stringify(object[key]);
           } else {
             value = object[key];
           }
-
           if (value.length > 60) {
             value =
               value.substr(0, 10) + "..." + value.substr(value.length - 10);
           }
-
           numberOfRows++;
-
           dataStrings.push(`${key}: ${value}`);
         }
-
         return dataStrings.join("<br>");
       }
-
       $("#instance-filter-dropdown").change(function () {
         $("#instance-filter").val($(this).val());
         $("#instance-filter").keyup();
       });
-
       $("#instance-filter").keyup(function () {
         clearTable();
         instanceFilter = $(this).val();
         storeSettings();
       });
-
       $("#blacklist-ids-incoming").keyup(function () {
         incomingBlacklistIds =
           $(this).val() === ""
@@ -408,15 +361,12 @@
                 .map((x) => parseInt(x));
         storeSettings();
       });
-
       $("#maxlogs").keyup(function () {
         if (isNaN(parseInt($(this).val()))) return $(this).val("");
-
         clearTable();
         maxLogs = parseInt($(this).val());
         storeSettings();
       });
-
       function loadSettings() {
         let settingsJson = localStorage.getItem("settings");
         if (settingsJson !== null) {
@@ -424,23 +374,17 @@
           (STATE = parseInt(settings["STATE"])),
             (instanceFilter = settings["instanceFilter"]),
             (incomingBlacklistIds = settings["incomingBlacklistIds"]);
-
           if (settings["maxLogs"] != null && !isNaN(parseInt(maxLogs)))
             maxLogs = parseInt(settings["maxLogs"]);
-
           if (STATE === 1) {
             $("#play-button").click();
           }
-
           $("#instance-filter").val(instanceFilter);
           $("#blacklist-ids-incoming").val(incomingBlacklistIds.join(","));
         }
-
         $("#maxlogs").val(maxLogs);
       }
-
       loadSettings();
-
       function storeSettings() {
         localStorage.setItem(
           "settings",
