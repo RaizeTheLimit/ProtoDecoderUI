@@ -6,7 +6,7 @@
 
 ProtoDecodeUI is a Tool to help analyze incoming and outgoing game data for Pokemon GO.
 
-## Note that this repo is designed to be used with yarn and not npm. Doubts see: [yarn-setup](https://github.com/RaizeTheLimit/ProtoDecoderUI/edit/main/README.md#yarn-setup) 
+### Note that this repo is designed to be used with yarn and not npm. Doubts see: [yarn-setup](https://github.com/RaizeTheLimit/ProtoDecoderUI?tab=readme-ov-file#yarn-setup) 
 
 ### Support
 Supports Decoding Requests and Response Messages
