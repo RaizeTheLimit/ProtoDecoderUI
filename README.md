@@ -9,8 +9,6 @@ ProtoDecodeUI is a Tool to help analyze incoming and outgoing game data for Poke
 #### Note that this repo is designed to be used with yarn and not npm. Doubts see: [yarn-setup](https://github.com/RaizeTheLimit/ProtoDecoderUI/edit/main/README.md#yarn-setup) 
 
 ### Support
-
-### Support
 Supports Decoding Requests and Response Messages
 
 ```
