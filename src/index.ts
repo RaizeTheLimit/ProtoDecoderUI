@@ -224,5 +224,15 @@ var outgoing = io.of("/outgoing").on("connection", function (socket) {
 
 httpServer.keepAliveTimeout = 0;
 httpServer.listen(portBind, function () {
-    console.log(`Server start access of this in urls: http://localhost:${portBind} or WLAN mode http://${getIPAddress()}:${portBind}`);
+    const welcome = `
+Server start access of this in urls: http://localhost:${portBind} or WLAN mode http://${getIPAddress()}:${portBind}.
+    
+    - Clients MITM:
+        1) --=FurtiF™=- Tools EndPoints: http://${getIPAddress()}:${portBind}/traffic or http://${getIPAddress()}:${portBind}/golbat (depending on the modes chosen)
+        2) If Other set here...
+        3) ...
+
+ProtoDecoderUI is not responsible for your errors.
+`;
+    console.log(welcome);
 });
