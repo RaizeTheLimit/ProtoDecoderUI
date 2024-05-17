@@ -128,10 +128,10 @@ export const decodeProto = (method: number, data: string, dataType: string): Dec
                         data: parsedData,
                     };
                 } catch (error) {
-                    console.error(`Error parsing response ${foundMethodString} -> ${error}`);
+                    console.error(`Error parsing response ${foundMethodString} method: [${foundReq}] -> ${error}`);
                 }
             } else if (dataType === "response") {
-                console.warn(`Response ${foundMethod[0]} Not Implemented`)
+                console.warn(`Response ${foundReq} Not Implemented`)
             }
         }
     }
