@@ -175,7 +175,8 @@
       var incoming = io.connect("/incoming"),
         outgoing = io.connect("/outgoing");
       let incomingProtocolId = 0;
-      let maxLogs = 100;
+      let maxLogs = 100,
+        darkMode = false;
       let maxLogsValue = [1000, 500, 300, 200, 100, 50];
       resetLogsValue();
       let messages = [];
@@ -281,10 +282,14 @@
           document.body.classList.remove("dark");
           $(this).removeClass("fa-moon");
           $(this).addClass("fa-sun");
+          darkMode = false;
+          storeSettings();
         } else {
           document.body.classList.add("dark");
           $(this).removeClass("fa-sun");
           $(this).addClass("fa-moon");
+          darkMode = true;
+          storeSettings();
         }
       });
       $("#play-button").click(function () {
@@ -418,6 +423,10 @@
           if (settings["maxLogs"] != null && !isNaN(parseInt(maxLogs))) {
             setLogValue(parseInt(settings["maxLogs"]));
           }
+          if(settings["darkMode"] != null && JSON.parse(settings["darkMode"])) {
+            darkMode = true;
+            document.body.classList.add("dark");
+          }
           if (STATE === 1) {
             $("#play-button").click();
           }
@@ -435,6 +444,7 @@
             instanceFilter: instanceFilter,
             incomingBlacklistIds: incomingBlacklistIds,
             maxLogs: maxLogs,
+            darkMode: darkMode
           })
         );
       }

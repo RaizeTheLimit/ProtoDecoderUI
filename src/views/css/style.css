@@ -38,7 +38,20 @@ body {
 	.table-bordered td, .table-bordered th {
 		border: 1px solid rgba(255, 255, 255, 0.2);
 	}
+
+	table tr:hover {
+		color: var(--important) !important;
+	}
+
+	table tbody tr:nth-child(odd) {
+		background-color: rgba(255, 255, 255, 0.05);
+	}
 }
+
+table tr:hover {
+	cursor: pointer;
+}
+
 
 .running {
 	color: var(--important)
