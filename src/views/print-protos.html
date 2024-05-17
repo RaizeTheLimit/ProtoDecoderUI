@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <!-- Doc at https://developer.mozilla.org/fr/docs/Web/HTML/Quirks_Mode_and_Standards_Mode -->
+<!-- Themes and more credits https://github.com/Dani-404 -->
 <html lang="en">
   <head>
     <meta charset="utf-8" />
@@ -40,6 +41,7 @@
             <h4 class="card-header">
               <div class="title-proto">ProtoDecoderUI</div>
               <div class="icons">
+                <i class="fas fa-sun" id="darkmode-button"></i>
                 <i class="fas fa-play" id="play-button"></i>
                 <i class="fas fa-pause" id="pause-button"></i>
                 <i class="fas fa-trash" id="clear-button"></i>
@@ -62,35 +64,23 @@
                 </div>
               </div>
               <div class="row">
-                <div class="col-sm">
-                  <div>
-                    <label for="blacklist-ids-incoming"
-                      >Blacklist Methods</label
-                    >
-                  </div>
-                  <div>
-                    <input
-                      type="text"
-                      id="blacklist-ids-incoming"
-                      value=""
-                      style="width: 100%"
-                      placeholder="5026,1601,1103,..."
-                    />
-                  </div>
+                <div class="col-sm-10">
+                  <label for="blacklist-ids-incoming" style="width: 80px"
+                    >Blacklist Methods</label
+                  >
+                  <input
+                    type="text"
+                    id="blacklist-ids-incoming"
+                    placeholder="5026,1601,1103,..."
+                    style="width: calc(100% - 83px)"
+                  />
                 </div>
-                <div class="col-sm">
-                  <div>
-                    <label for="maxlogs">Maxlogs</label>
-                  </div>
-                  <div>
-                    <input
-                      type="number"
-                      id="maxlogs"
-                      value=""
-                      style="width: 100%"
-                      placeholder="150"
-                    />
-                  </div>
+                <div class="col-sm-2">
+                  <label for="maxlogs" style="width: 40px">Maxlogs</label>
+                  <select
+                    id="maxlogs"
+                    style="width: calc(100% - 43px); padding: 3px"
+                  ></select>
                 </div>
               </div>
               <table
@@ -154,6 +144,10 @@
       </div>
     </div>
     <div class="footer">
+      <a href="https://github.com/Dani-404" target="_blank"
+        >Themes and more credits (Daniel)</a
+      >
+      -
       <a href="https://github.com/RaizeTheLimit/ProtoDecoderUI" target="_blank"
         >ProtoDecoderUI</a
       >
@@ -182,6 +176,8 @@
         outgoing = io.connect("/outgoing");
       let incomingProtocolId = 0;
       let maxLogs = 100;
+      let maxLogsValue = [1000, 500, 300, 200, 100, 50];
+      resetLogsValue();
       let messages = [];
       let foundInstances = [];
       let instanceFilter = "";
@@ -222,6 +218,7 @@
             if (el != null) {
               if (el == "data") td.innerHTML = objectToReadable(message[el]);
               else td.innerText = message[el];
+              if (el == "methodId") td.classList.add("important");
             } else {
               td.innerText = "Waiting data...";
               message.responseHtmlElement = td;
@@ -279,6 +276,17 @@
           .jsonViewer(message.response.data);
         $("#modal-detail").modal();
       });
+      $("#darkmode-button").click(function () {
+        if (document.body.classList.contains("dark")) {
+          document.body.classList.remove("dark");
+          $(this).removeClass("fa-moon");
+          $(this).addClass("fa-sun");
+        } else {
+          document.body.classList.add("dark");
+          $(this).removeClass("fa-sun");
+          $(this).addClass("fa-moon");
+        }
+      });
       $("#play-button").click(function () {
         STATE = 1;
         setStateOnButtons();
@@ -296,6 +304,32 @@
         $("#data_socket tbody tr").remove();
         messages = [];
       }
+      function resetLogsValue() {
+        $("#maxlogs option").each((i, el) => {
+          el.remove();
+        });
+        maxLogsValue.sort((a, b) => a - b);
+        for (let i in maxLogsValue) {
+          const option = document.createElement("option");
+          option.innerText = maxLogsValue[i];
+
+          if (maxLogsValue[i] == maxLogs) option.selected = true;
+
+          $("#maxlogs").append(option);
+        }
+        const otherOption = document.createElement("option");
+        otherOption.innerText = "Other";
+        $("#maxlogs").append(otherOption);
+      }
+      function setLogValue(val) {
+        maxLogs = val;
+        if (!maxLogsValue.includes(val)) {
+          maxLogsValue.push(val);
+          resetLogsValue();
+        }
+        clearTable();
+        storeSettings();
+      }
       function setStateOnButtons() {
         let id = "";
         let idDisabled = "";
@@ -309,8 +343,10 @@
             idDisabled = "play-button";
             break;
         }
-        $("#" + id).css("color", "#000000");
-        $("#" + idDisabled).css("color", "#888888");
+        $("#" + id).css("opacity", 1);
+        $("#" + id).addClass("running");
+        $("#" + idDisabled).css("opacity", 0.5);
+        $("#" + idDisabled).removeClass("running");
       }
       function appendFoundName(name) {
         const option = document.createElement("option");
@@ -361,11 +397,16 @@
                 .map((x) => parseInt(x));
         storeSettings();
       });
-      $("#maxlogs").keyup(function () {
-        if (isNaN(parseInt($(this).val()))) return $(this).val("");
-        clearTable();
-        maxLogs = parseInt($(this).val());
-        storeSettings();
+      $("#maxlogs").on("change", function () {
+        if (this.value == "Other") {
+          let val = prompt("Please enter the value", "");
+          if (val == null || val.length == 0 || isNaN(parseInt(val)))
+            return alert("Invalid value!");
+          setLogValue(parseInt(val));
+          return;
+        }
+        if (isNaN(this.value)) return;
+        setLogValue(parseInt(this.value));
       });
       function loadSettings() {
         let settingsJson = localStorage.getItem("settings");
@@ -374,8 +415,9 @@
           (STATE = parseInt(settings["STATE"])),
             (instanceFilter = settings["instanceFilter"]),
             (incomingBlacklistIds = settings["incomingBlacklistIds"]);
-          if (settings["maxLogs"] != null && !isNaN(parseInt(maxLogs)))
-            maxLogs = parseInt(settings["maxLogs"]);
+          if (settings["maxLogs"] != null && !isNaN(parseInt(maxLogs))) {
+            setLogValue(parseInt(settings["maxLogs"]));
+          }
           if (STATE === 1) {
             $("#play-button").click();
           }

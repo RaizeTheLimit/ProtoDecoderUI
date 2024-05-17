@@ -1,11 +1,68 @@
+:root {
+	--black-color: #212529;
+	--background-color: #fff;
+	--important: #212529;
+}
+
 * {
 	margin: 0;
 	font-size: x-small;
 	font-family: Roboto, Arial, sans-serif;
 }
 
+body {
+	background-color: var(--background-color) !important;
+	color: var(--black-color) !important;
+	transition-duration: 0.5s;
+}
+
+.dark {
+	--black-color: #FFF;
+	--background-color: #222535;
+	--important: #f3934a;
+
+	.card {
+		background-color: rgba(0, 0, 0, 0.2) !important;
+	}
+
+	input, select {
+		background-color: rgba(0, 0, 0, 0.2);
+		color: var(--black-color);
+		border: 1px solid rgba(255, 255, 255, 0.2);
+
+		option {
+			background-color: var(--background-color);
+		}
+	}
+
+	.table-bordered td, .table-bordered th {
+		border: 1px solid rgba(255, 255, 255, 0.2);
+	}
+}
+
+.running {
+	color: var(--important)
+}
+
+.modal-content {
+	background-color: var(--background-color) !important;
+
+	pre {
+		color: var(--black-color) !important;
+	}
+}
+
+table {
+	color: var(--black-color) !important;
+}
+
 table tr td {
 	word-break: break-all;
+}
+
+table tr td.important {
+	font-weight: bold;
+	color: var(--important);
 }
 
 .card-header {
