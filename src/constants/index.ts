@@ -319,6 +319,8 @@ export const requestMessagesResponses = {
 	REQUEST_TYPE_METHOD_GET_SAVE_FOR_LATER_ENTRIES: [2466, null, null],
 	REQUEST_TYPE_METHOD_GET_MP_SUMMARY: [2467, null, null],
 	REQUEST_TYPE_METHOD_REPLENISH_MP: [2468, null, null],
+	REQUEST_TYPE_METHOD_REPORT_STATION: [2470, null, null],
+	REQUEST_TYPE_METHOD_DEBUG_RESET_DAILY_MP: [2471, null, null],
 	REQUEST_TYPE_METHOD_GET_VPS_EVENTS: [3000, POGOProtos.Rpc.GetVpsEventProto, POGOProtos.Rpc.GetVpsEventOutProto],
 	REQUEST_TYPE_METHOD_UPDATE_VPS_EVENTS: [3001, POGOProtos.Rpc.UpdateVpsEventProto, POGOProtos.Rpc.UpdateVpsEventOutProto],
 	REQUEST_TYPE_METHOD_ADD_PTC_LOGIN_ACTION: [3002, POGOProtos.Rpc.AddPtcLoginActionProto, POGOProtos.Rpc.AddPtcLoginActionOutProto],
