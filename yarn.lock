@@ -15,9 +15,9 @@
     wrap-ansi-cjs "npm:wrap-ansi@^7.0.0"
 
 "@na-ji/pogo-protos@^2.131.0":
-  version "2.146.0"
-  resolved "https://registry.yarnpkg.com/@na-ji/pogo-protos/-/pogo-protos-2.146.0.tgz#2ef1182a16d414698e5031e839100c02950a3040"
-  integrity sha512-zzp9lKtANZ+znoXC/GOy0hpaJ/7joJJWHvvIxzTFrWXYkO6+zLyFI4t9AT++flR87QRo5Vhue7MGb91Gzrx4uQ==
+  version "2.147.0"
+  resolved "https://registry.yarnpkg.com/@na-ji/pogo-protos/-/pogo-protos-2.147.0.tgz#417a44fc1418c8e77d8ca38852ab88745c890cac"
+  integrity sha512-Zx2c1AL7nBf3dggE/neaFsu5rvE7oNGA5ArbQIynnPtFROl6I9qK6kNmnR8i91dP3nmhLJUMUlPpIQwXO8Uf4w==
   dependencies:
     protobufjs "^6.11.3"
 
