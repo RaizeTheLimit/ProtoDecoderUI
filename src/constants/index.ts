@@ -445,6 +445,7 @@ export const requestMessagesResponses = {
 	REQUEST_TYPE_SOCIAL_ACTION_UNBLOCK_ACCOUNT: [10026, POGOProtos.Rpc.InternalUnblockAccountProto, POGOProtos.Rpc.InternalUnblockAccountOutProto],
 	REQUEST_TYPE_SOCIAL_ACTION_GET_OUTGING_BLOCKS: [10027, POGOProtos.Rpc.InternalGetOutgoingBlocksProto, POGOProtos.Rpc.InternalGetOutgoingBlocksOutProto],
 	REQUEST_TYPE_SOCIAL_ACTION_IS_ACCOUNT_BLOCKED: [10028, POGOProtos.Rpc.InternalIsAccountBlockedProto, POGOProtos.Rpc.InternalIsAccountBlockedOutProto],
+	REQUEST_TYPE_SOCIAL_ACTION_LIST_FRIEND_ACTIVITIES: [10029, POGOProtos.Rpc.ListFriendActivitiesRequestProto, POGOProtos.Rpc.ListFriendActivitiesResponseProto],
 	REQUEST_TYPE_SOCIAL_ACTION_REGISTER_PUSH_NOTIFICATION: [10101, POGOProtos.Rpc.InternalPushNotificationRegistryProto, POGOProtos.Rpc.InternalPushNotificationRegistryOutProto],
 	REQUEST_TYPE_SOCIAL_ACTION_UNREGISTER_PUSH_NOTIFICATION: [10102, null, null],
 	REQUEST_TYPE_SOCIAL_ACTION_UPDATE_NOTIFICATION: [10103, POGOProtos.Rpc.InternalUpdateNotificationProto, POGOProtos.Rpc.InternalUpdateNotificationOutProto],
