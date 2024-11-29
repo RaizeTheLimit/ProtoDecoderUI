@@ -367,6 +367,8 @@ export const requestMessagesResponses = {
 	REQUEST_TYPE_METHOD_UPDATE_SURVEY_ELIGIBILITY: [3026, POGOProtos.Rpc.UpdateSurveyEligibilityProto, POGOProtos.Rpc.UpdateSurveyEligibilityOutProto],
 	REQUEST_TYPE_METHOD_SMART_GLASSES_SYNC_SETTINGS: [3027, POGOProtos.Rpc.SmartGlassesSyncSettingsRequestProto, POGOProtos.Rpc.SmartGlassesSyncSettingsResponseProto],
 	REQUEST_TYPE_METHOD_COMPLETE_VISIT_PAGE_QUEST: [3030, POGOProtos.Rpc.CompleteVisitPageQuestProto, POGOProtos.Rpc.CompleteVisitPageQuestOutProto],
+	REQUEST_TYPE_METHOD_CLAIM_EVENT_PASS_REWARDS: [3034, POGOProtos.Rpc.ClaimEventPassRewardsRequestProto, POGOProtos.Rpc.ClaimEventPassRewardsResponseProto],
+	REQUEST_TYPE_METHOD_CLAIM_ALL_EVENT_PASS_REWARDS: [3035, null, null],
 	REQUEST_TYPE_PLATFORM_REGISTER_PUSH_NOTIFICATION: [5000, POGOProtos.Rpc.PushNotificationRegistryProto, POGOProtos.Rpc.PushNotificationRegistryOutProto],
 	REQUEST_TYPE_PLATFORM_UNREGISTER_PUSH_NOTIFICATION: [5001, null, null],
 	REQUEST_TYPE_PLATFORM_UPDATE_NOTIFICATION_STATUS: [5002, POGOProtos.Rpc.UpdateNotificationProto, POGOProtos.Rpc.UpdateNotificationOutProto],
