@@ -1,6 +1,6 @@
 import http from "http";
 import fs from "fs";
-import { WebStreamBuffer, getIPAddress, moduleConfigIsAvailable, redirect_post_golbat } from "./utils";
+import { WebStreamBuffer, getIPAddress, handleData, moduleConfigIsAvailable, redirect_post_golbat } from "./utils";
 import { decodePayload, decodePayloadTraffic } from "./parser/proto-parser";
 
 // try looking if config file exists...
@@ -27,6 +27,10 @@ const httpServer = http.createServer(function (req, res) {
                 let parsedData = JSON.parse(requestData);
                 res.writeHead(200, { "Content-Type": "application/json" });
                 res.end("");
+                if (Array.isArray(parsedData)) {
+                    console.error("Incoming Data is an array, need to be single object");
+                    return;
+                }
                 // redirect because endpoint is in use there, leave null to ignore.
                 // ex http://123.123.123.123:9001/raw
                 // this need a test ping ok or throw for better.
@@ -79,33 +83,12 @@ const httpServer = http.createServer(function (req, res) {
                 let parsedData = JSON.parse(requestData);
                 res.writeHead(200, { "Content-Type": "application/json" });
                 res.end("");
-                for (let i = 0; i < parsedData['protos'].length; i++) {
-                    const parsedRequestData = decodePayloadTraffic(
-                        parsedData['protos'][i].method,
-                        parsedData['protos'][i].request,
-                        "request"
-                    );
-                    if (typeof parsedRequestData === "string") {
-                        incomingProtoWebBufferInst.write({ error: parsedRequestData });
-                    } else {
-                        for (let parsedObject of parsedRequestData) {
-                            parsedObject.identifier = identifier;
-                            incomingProtoWebBufferInst.write(parsedObject);
-                        }
+                if (Array.isArray(parsedData)) {
+                    for (let i = 0; i < parsedData.length; i++) {
+                        handleData(incomingProtoWebBufferInst, outgoingProtoWebBufferInst, identifier, parsedData[i])
                     }
-                    const parsedResponseData = decodePayloadTraffic(
-                        parsedData['protos'][i].method,
-                        parsedData['protos'][i].response,
-                        "response"
-                    );
-                    if (typeof parsedResponseData === "string") {
-                        outgoingProtoWebBufferInst.write({ error: parsedResponseData });
-                    } else {
-                        for (let parsedObject of parsedResponseData) {
-                            parsedObject.identifier = identifier;
-                            outgoingProtoWebBufferInst.write(parsedObject);
-                        }
-                    }
+                } else {
+                    handleData(incomingProtoWebBufferInst, outgoingProtoWebBufferInst, identifier, parsedData)
                 }
             });
             break;
