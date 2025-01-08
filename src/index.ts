@@ -79,31 +79,65 @@ const httpServer = http.createServer(function (req, res) {
                 let parsedData = JSON.parse(requestData);
                 res.writeHead(200, { "Content-Type": "application/json" });
                 res.end("");
-                for (let i = 0; i < parsedData['protos'].length; i++) {
-                    const parsedRequestData = decodePayloadTraffic(
-                        parsedData['protos'][i].method,
-                        parsedData['protos'][i].request,
-                        "request"
-                    );
-                    if (typeof parsedRequestData === "string") {
-                        incomingProtoWebBufferInst.write({ error: parsedRequestData });
-                    } else {
-                        for (let parsedObject of parsedRequestData) {
-                            parsedObject.identifier = identifier;
-                            incomingProtoWebBufferInst.write(parsedObject);
+                if (Array.isArray(parsedData)) {
+                    for (let x = 0; x < parsedData.length; x++) {
+                        for (let i = 0; i < parsedData[x]['protos'].length; i++) {
+                            const parsedRequestData = decodePayloadTraffic(
+                                parsedData[x]['protos'][i].method,
+                                parsedData[x]['protos'][i].request,
+                                "request"
+                            );
+                            if (typeof parsedRequestData === "string") {
+                                incomingProtoWebBufferInst.write({ error: parsedRequestData });
+                            } else {
+                                for (let parsedObject of parsedRequestData) {
+                                    parsedObject.identifier = identifier;
+                                    incomingProtoWebBufferInst.write(parsedObject);
+                                }
+                            }
+                            const parsedResponseData = decodePayloadTraffic(
+                                parsedData[x]['protos'][i].method,
+                                parsedData[x]['protos'][i].response,
+                                "response"
+                            );
+                            if (typeof parsedResponseData === "string") {
+                                outgoingProtoWebBufferInst.write({ error: parsedResponseData });
+                            } else {
+                                for (let parsedObject of parsedResponseData) {
+                                    parsedObject.identifier = identifier;
+                                    outgoingProtoWebBufferInst.write(parsedObject);
+                                }
+                            }
                         }
                     }
-                    const parsedResponseData = decodePayloadTraffic(
-                        parsedData['protos'][i].method,
-                        parsedData['protos'][i].response,
-                        "response"
-                    );
-                    if (typeof parsedResponseData === "string") {
-                        outgoingProtoWebBufferInst.write({ error: parsedResponseData });
-                    } else {
-                        for (let parsedObject of parsedResponseData) {
-                            parsedObject.identifier = identifier;
-                            outgoingProtoWebBufferInst.write(parsedObject);
+                }
+                else {
+                    for (let i = 0; i < parsedData['protos'].length; i++) {
+                        const parsedRequestData = decodePayloadTraffic(
+                            parsedData['protos'][i].method,
+                            parsedData['protos'][i].request,
+                            "request"
+                        );
+                        if (typeof parsedRequestData === "string") {
+                            incomingProtoWebBufferInst.write({ error: parsedRequestData });
+                        } else {
+                            for (let parsedObject of parsedRequestData) {
+                                parsedObject.identifier = identifier;
+                                incomingProtoWebBufferInst.write(parsedObject);
+                            }
+                        }
+                        const parsedResponseData = decodePayloadTraffic(
+                            parsedData['protos'][i].method,
+                            parsedData['protos'][i].response,
+                            "response"
+                        );
+                        if (typeof parsedResponseData === "string") {
+                            outgoingProtoWebBufferInst.write({ error: parsedResponseData });
+                        } else {
+                            for (let parsedObject of parsedResponseData) {
+                                parsedObject.identifier = identifier;
+                                outgoingProtoWebBufferInst.write(parsedObject);
+                            }
                         }
                     }
                 }
