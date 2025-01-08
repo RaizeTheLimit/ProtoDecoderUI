@@ -102,7 +102,7 @@ cd ./ProtoDecoderUI
 **Copy and adjust config file**
 ```bash
 # Copy the config.json file
-cp config/example.config.json config/config.json
+cp src/config/example.config.json src/config/config.json
 ```
 
 ### Yarn setup:
