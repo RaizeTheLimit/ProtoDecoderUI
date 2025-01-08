@@ -1,6 +1,8 @@
 import { networkInterfaces } from "os";
 import http from "http";
 import { parse } from "url";
+import { WebStreamBuffer } from "./web-stream-buffer";
+import { decodePayloadTraffic } from "../parser/proto-parser";
 
 export const b64Decode = (data: string) => {
     return Buffer.from(data, "base64");
@@ -26,6 +28,37 @@ export function getIPAddress() {
         }
     }
     return '0.0.0.0';
+}
+
+export function handleData(incoming: WebStreamBuffer, outgoing: WebStreamBuffer, identifier: any, parsedData: string) {
+    for (let i = 0; i < parsedData['protos'].length; i++) {
+        const parsedRequestData = decodePayloadTraffic(
+            parsedData['protos'][i].method,
+            parsedData['protos'][i].request,
+            "request"
+        );
+        if (typeof parsedRequestData === "string") {
+            incoming.write({ error: parsedRequestData });
+        } else {
+            for (let parsedObject of parsedRequestData) {
+                parsedObject.identifier = identifier;
+                incoming.write(parsedObject);
+            }
+        }
+        const parsedResponseData = decodePayloadTraffic(
+            parsedData['protos'][i].method,
+            parsedData['protos'][i].response,
+            "response"
+        );
+        if (typeof parsedResponseData === "string") {
+            outgoing.write({ error: parsedResponseData });
+        } else {
+            for (let parsedObject of parsedResponseData) {
+                parsedObject.identifier = identifier;
+                outgoing.write(parsedObject);
+            }
+        }
+    }
 }
 
 export function redirect_post_golbat(redirect_url: string, redirect_token: string, redirect_data: any) {
