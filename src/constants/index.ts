@@ -204,7 +204,7 @@ export const requestMessagesResponses = {
 	REQUEST_TYPE_METHOD_START_ROUTE: [1404, POGOProtos.Rpc.StartRouteProto, POGOProtos.Rpc.StartRouteOutProto],
 	REQUEST_TYPE_METHOD_GET_ROUTES: [1405, POGOProtos.Rpc.GetRoutesProto, POGOProtos.Rpc.GetRoutesOutProto],
 	REQUEST_TYPE_METHOD_PROGRESS_ROUTE: [1406, POGOProtos.Rpc.ProgressRouteProto, POGOProtos.Rpc.ProgressRouteOutProto],
-	REQUEST_TYPE_METHOD_PROCESS_TAPPABLE: [1408, POGOProtos.Rpc.StartRouteProto, POGOProtos.Rpc.StartRouteOutProto],
+	REQUEST_TYPE_METHOD_PROCESS_TAPPABLE: [1408, POGOProtos.Rpc.ProcessTappableProto, POGOProtos.Rpc.ProcessTappableOutProto],
 	REQUEST_TYPE_METHOD_LIST_ROUTE_BADGES: [1409, POGOProtos.Rpc.ListRouteBadgesProto, POGOProtos.Rpc.ListRouteBadgesOutProto],
 	REQUEST_TYPE_METHOD_CANCEL_ROUTE: [1410, POGOProtos.Rpc.CancelRouteProto, POGOProtos.Rpc.CancelRouteOutProto],
 	REQUEST_TYPE_METHOD_LIST_ROUTE_STAMPS: [1411, POGOProtos.Rpc.ListRouteStampsProto, POGOProtos.Rpc.ListRouteStampsOutProto],
