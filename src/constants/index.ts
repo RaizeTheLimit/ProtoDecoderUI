@@ -394,6 +394,8 @@ export const requestMessagesResponses = {
 	REQUEST_TYPE_METHOD_END_POKEMON_TRAINING: [3054, POGOProtos.Rpc.EndPokemonTrainingProto, POGOProtos.Rpc.EndPokemonTrainingOutProto],
 	REQUEST_TYPE_METHOD_GET_SUGGESTED_PLAYERS_SOCIAL: [3055, POGOProtos.Rpc.GetSuggestedPlayersSocialProto, POGOProtos.Rpc.GetSuggestedPlayersSocialOutProto],
 	REQUEST_TYPE_METHOD_START_TGR_BATTLE: [3056, POGOProtos.Rpc.StartTgrBattleProto, POGOProtos.Rpc.StartTgrBattleOutProto],
+	REQUEST_TYPE_METHOD_GRANT_EXPIRED_ITEM_CONSOLATION: [3057, POGOProtos.Rpc.GrantExpiredItemConsolationProto, POGOProtos.Rpc.GrantExpiredItemConsolationOutProto],
+	REQUEST_TYPE_METHOD_COMPLETE_TGR_BATTLE: [3058, POGOProtos.Rpc.CompleteTgrBattleProto, POGOProtos.Rpc.CompleteTgrBattleOutProto],
 	REQUEST_TYPE_PLATFORM_REGISTER_PUSH_NOTIFICATION: [5000, POGOProtos.Rpc.PushNotificationRegistryProto, POGOProtos.Rpc.PushNotificationRegistryOutProto],
 	REQUEST_TYPE_PLATFORM_UNREGISTER_PUSH_NOTIFICATION: [5001, null, null],
 	REQUEST_TYPE_PLATFORM_UPDATE_NOTIFICATION_STATUS: [5002, POGOProtos.Rpc.UpdateNotificationProto, POGOProtos.Rpc.UpdateNotificationOutProto],
