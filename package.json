@@ -3,6 +3,8 @@
   "version": "1.0.0",
   "description": "",
   "main": "dist/index.js",
+  "packageManager": "yarn@1.22.22",
+  "type": "module",
   "scripts": {
     "start": "node dist/index.js",
     "build": "rimraf dist/ && tsc && copyfiles -u 1 src/**/*.html src/**/*.css src/**/*.json src/**/*.png dist/",
