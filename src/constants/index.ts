@@ -356,6 +356,7 @@ export const requestMessagesResponses = {
 	REQUEST_TYPE_METHOD_GET_REMOTE_TRADABLE_FROM_OTHER_PLAYER: [2603, POGOProtos.Rpc.GetRemoteTradablePokemonFromOtherPlayerProto, POGOProtos.Rpc.GetRemoteTradablePokemonFromOtherPlayerOutProto],
 	REQUEST_TYPE_METHOD_GET_NON_REMOTE_TRADABLE_POKEMON: [2604, POGOProtos.Rpc.GetNonRemoteTradablePokemonProto, POGOProtos.Rpc.GetNonRemoteTradablePokemonOutProto],
 	REQUEST_TYPE_METHOD_GET_PENDING_REMOTE_TRADE: [2605, POGOProtos.Rpc.GetPendingRemoteTradeProto, POGOProtos.Rpc.GetPendingRemoteTradeOutProto],
+	REQUEST_TYPE_METHOD_RESPOND_REMOTE_TRADE: [2606, POGOProtos.Rpc.RespondRemoteTradeProto, POGOProtos.Rpc.RespondRemoteTradeOutProto],
 	REQUEST_TYPE_METHOD_GET_VPS_EVENTS: [3000, POGOProtos.Rpc.GetVpsEventProto, POGOProtos.Rpc.GetVpsEventOutProto],
 	REQUEST_TYPE_METHOD_UPDATE_VPS_EVENTS: [3001, POGOProtos.Rpc.UpdateVpsEventProto, POGOProtos.Rpc.UpdateVpsEventOutProto],
 	REQUEST_TYPE_METHOD_ADD_PTC_LOGIN_ACTION: [3002, POGOProtos.Rpc.AddPtcLoginActionProto, POGOProtos.Rpc.AddPtcLoginActionOutProto],
