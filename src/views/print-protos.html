@@ -126,12 +126,33 @@
           </div>
           <div class="modal-body">
             <p>Method name: <span class="method-name"></span></p>
-            <p>Incoming data:</p>
+            <p>Request data (Sent to server):</p>
             <pre class="method-data-incoming"></pre>
-            <p>Outgoing data:</p>
+            <p>Response data (Received from server):</p>
             <pre class="method-data-outgoing"></pre>
           </div>
           <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-primary"
+              id="download-incoming-json"
+            >
+              <i class="fas fa-download"></i> Download Request
+            </button>
+            <button
+              type="button"
+              class="btn btn-primary"
+              id="download-outgoing-json"
+            >
+              <i class="fas fa-download"></i> Download Response
+            </button>
+            <button
+              type="button"
+              class="btn btn-success"
+              id="download-combined-json"
+            >
+              <i class="fas fa-download"></i> Download Both
+            </button>
             <button
               type="button"
               class="btn btn-secondary"
@@ -264,9 +285,11 @@
           );
         }
       });
+      let currentModalMessage = null;
       $("#data_socket tbody").on("click", "tr", function () {
         const message = messages.filter((msg) => msg.id == $(this)[0].id)[0];
         if (message == null) return;
+        currentModalMessage = message;
         $("#modal-detail").find(".method-id").html(message.methodId);
         $("#modal-detail").find(".method-name").html(message.methodName);
         $("#modal-detail")
@@ -277,6 +300,47 @@
           .jsonViewer(message.response.data);
         $("#modal-detail").modal();
       });
+      function downloadJSON(data, filename) {
+        const jsonStr = JSON.stringify(data, null, 2);
+        const blob = new Blob([jsonStr], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      }
+
+      $("#download-incoming-json").click(function () {
+        if (!currentModalMessage) return;
+        const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
+        const filename = `request_${currentModalMessage.methodName}_${currentModalMessage.methodId}_${timestamp}.json`;
+        downloadJSON(currentModalMessage.data, filename);
+      });
+
+      $("#download-outgoing-json").click(function () {
+        if (!currentModalMessage || !currentModalMessage.response) return;
+        const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
+        const filename = `response_${currentModalMessage.methodName}_${currentModalMessage.methodId}_${timestamp}.json`;
+        downloadJSON(currentModalMessage.response.data, filename);
+      });
+
+      $("#download-combined-json").click(function () {
+        if (!currentModalMessage) return;
+        const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
+        const filename = `combined_${currentModalMessage.methodName}_${currentModalMessage.methodId}_${timestamp}.json`;
+        const combinedData = {
+          identifier: currentModalMessage.identifier,
+          methodId: currentModalMessage.methodId,
+          methodName: currentModalMessage.methodName,
+          request: currentModalMessage.data,
+          response: currentModalMessage.response ? currentModalMessage.response.data : null
+        };
+        downloadJSON(combinedData, filename);
+      });
+
       $("#darkmode-button").click(function () {
         if (document.body.classList.contains("dark")) {
           document.body.classList.remove("dark");
