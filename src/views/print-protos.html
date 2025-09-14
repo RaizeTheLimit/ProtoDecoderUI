@@ -59,20 +59,26 @@
                   />
                   <label for="instance-filter-dropdown">Found Instances:</label>
                   <select id="instance-filter-dropdown">
-                    <option value=""></option>
+                    <option value="">All Instances</option>
                   </select>
                 </div>
               </div>
               <div class="row">
                 <div class="col-sm-10">
-                  <label for="blacklist-ids-incoming" style="width: 80px"
-                    >Blacklist Methods</label
+                  <div style="display: inline-block; margin-right: 10px;">
+                    <select id="filter-mode" style="padding: 3px;">
+                      <option value="blacklist">Blacklist</option>
+                      <option value="whitelist">Whitelist</option>
+                    </select>
+                  </div>
+                  <label for="method-filter-ids" id="filter-label" style="width: 80px"
+                    >Methods</label
                   >
                   <input
                     type="text"
-                    id="blacklist-ids-incoming"
+                    id="method-filter-ids"
                     placeholder="5026,1601,1103,..."
-                    style="width: calc(100% - 83px)"
+                    style="width: calc(100% - 200px)"
                   />
                 </div>
                 <div class="col-sm-2">
@@ -126,12 +132,33 @@
           </div>
           <div class="modal-body">
             <p>Method name: <span class="method-name"></span></p>
-            <p>Incoming data:</p>
+            <p>Request data (Sent to server):</p>
             <pre class="method-data-incoming"></pre>
-            <p>Outgoing data:</p>
+            <p>Response data (Received from server):</p>
             <pre class="method-data-outgoing"></pre>
           </div>
           <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-primary"
+              id="download-incoming-json"
+            >
+              <i class="fas fa-download"></i> Download Request
+            </button>
+            <button
+              type="button"
+              class="btn btn-primary"
+              id="download-outgoing-json"
+            >
+              <i class="fas fa-download"></i> Download Response
+            </button>
+            <button
+              type="button"
+              class="btn btn-success"
+              id="download-combined-json"
+            >
+              <i class="fas fa-download"></i> Download Both
+            </button>
             <button
               type="button"
               class="btn btn-secondary"
@@ -182,7 +209,8 @@
       let messages = [];
       let foundInstances = [];
       let instanceFilter = "";
-      let incomingBlacklistIds = [];
+      let methodFilterIds = [];
+      let filterMode = "blacklist";
       incoming.on("protos", function (data) {
         if (foundInstances.indexOf(data.identifier) === -1) {
           foundInstances.push(data.identifier);
@@ -191,11 +219,16 @@
         if (STATE !== 1) {
           return;
         }
-        if (instanceFilter == "" || data.identifier !== instanceFilter) {
+        if (instanceFilter !== "" && data.identifier !== instanceFilter) {
           return;
         }
-        if (incomingBlacklistIds.length > 0) {
-          if (incomingBlacklistIds.indexOf(data.methodId) !== -1) {
+        if (methodFilterIds.length > 0) {
+          const methodIdNum = parseInt(data.methodId);
+          const isInList = methodFilterIds.indexOf(methodIdNum) !== -1;
+          if (filterMode === "blacklist" && isInList) {
+            return;
+          }
+          if (filterMode === "whitelist" && !isInList) {
             return;
           }
         }
@@ -239,12 +272,17 @@
         if (STATE !== 1) {
           return;
         }
-        if (incomingBlacklistIds.length > 0) {
-          if (incomingBlacklistIds.indexOf(data.methodId) !== -1) {
+        if (methodFilterIds.length > 0) {
+          const methodIdNum = parseInt(data.methodId);
+          const isInList = methodFilterIds.indexOf(methodIdNum) !== -1;
+          if (filterMode === "blacklist" && isInList) {
+            return;
+          }
+          if (filterMode === "whitelist" && !isInList) {
             return;
           }
         }
-        if (instanceFilter == "" || data.identifier !== instanceFilter) {
+        if (instanceFilter !== "" && data.identifier !== instanceFilter) {
           return;
         }
         if (typeof data.error !== "undefined") {
@@ -264,9 +302,11 @@
           );
         }
       });
+      let currentModalMessage = null;
       $("#data_socket tbody").on("click", "tr", function () {
         const message = messages.filter((msg) => msg.id == $(this)[0].id)[0];
         if (message == null) return;
+        currentModalMessage = message;
         $("#modal-detail").find(".method-id").html(message.methodId);
         $("#modal-detail").find(".method-name").html(message.methodName);
         $("#modal-detail")
@@ -277,6 +317,47 @@
           .jsonViewer(message.response.data);
         $("#modal-detail").modal();
       });
+      function downloadJSON(data, filename) {
+        const jsonStr = JSON.stringify(data, null, 2);
+        const blob = new Blob([jsonStr], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      }
+
+      $("#download-incoming-json").click(function () {
+        if (!currentModalMessage) return;
+        const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
+        const filename = `request_${currentModalMessage.methodName}_${currentModalMessage.methodId}_${timestamp}.json`;
+        downloadJSON(currentModalMessage.data, filename);
+      });
+
+      $("#download-outgoing-json").click(function () {
+        if (!currentModalMessage || !currentModalMessage.response) return;
+        const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
+        const filename = `response_${currentModalMessage.methodName}_${currentModalMessage.methodId}_${timestamp}.json`;
+        downloadJSON(currentModalMessage.response.data, filename);
+      });
+
+      $("#download-combined-json").click(function () {
+        if (!currentModalMessage) return;
+        const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
+        const filename = `combined_${currentModalMessage.methodName}_${currentModalMessage.methodId}_${timestamp}.json`;
+        const combinedData = {
+          identifier: currentModalMessage.identifier,
+          methodId: currentModalMessage.methodId,
+          methodName: currentModalMessage.methodName,
+          request: currentModalMessage.data,
+          response: currentModalMessage.response ? currentModalMessage.response.data : null
+        };
+        downloadJSON(combinedData, filename);
+      });
+
       $("#darkmode-button").click(function () {
         if (document.body.classList.contains("dark")) {
           document.body.classList.remove("dark");
@@ -392,14 +473,20 @@
         instanceFilter = $(this).val();
         storeSettings();
       });
-      $("#blacklist-ids-incoming").keyup(function () {
-        incomingBlacklistIds =
+      $("#method-filter-ids").keyup(function () {
+        methodFilterIds =
           $(this).val() === ""
             ? []
             : $(this)
                 .val()
                 .split(",")
                 .map((x) => parseInt(x));
+        storeSettings();
+      });
+
+      $("#filter-mode").change(function () {
+        filterMode = $(this).val();
+        clearTable();
         storeSettings();
       });
       $("#maxlogs").on("change", function () {
@@ -418,8 +505,16 @@
         if (settingsJson !== null) {
           const settings = JSON.parse(settingsJson);
           (STATE = parseInt(settings["STATE"])),
-            (instanceFilter = settings["instanceFilter"]),
-            (incomingBlacklistIds = settings["incomingBlacklistIds"]);
+            (instanceFilter = settings["instanceFilter"]);
+          // Handle legacy blacklist settings
+          if (settings["incomingBlacklistIds"]) {
+            methodFilterIds = settings["incomingBlacklistIds"];
+          } else if (settings["methodFilterIds"]) {
+            methodFilterIds = settings["methodFilterIds"];
+          }
+          if (settings["filterMode"]) {
+            filterMode = settings["filterMode"];
+          }
           if (settings["maxLogs"] != null && !isNaN(parseInt(maxLogs))) {
             setLogValue(parseInt(settings["maxLogs"]));
           }
@@ -431,7 +526,8 @@
             $("#play-button").click();
           }
           $("#instance-filter").val(instanceFilter);
-          $("#blacklist-ids-incoming").val(incomingBlacklistIds.join(","));
+          $("#method-filter-ids").val(methodFilterIds.join(","));
+          $("#filter-mode").val(filterMode);
         }
         $("#maxlogs").val(maxLogs);
       }
@@ -442,7 +538,8 @@
           JSON.stringify({
             STATE: STATE,
             instanceFilter: instanceFilter,
-            incomingBlacklistIds: incomingBlacklistIds,
+            methodFilterIds: methodFilterIds,
+            filterMode: filterMode,
             maxLogs: maxLogs,
             darkMode: darkMode
           })
