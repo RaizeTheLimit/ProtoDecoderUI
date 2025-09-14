@@ -59,20 +59,26 @@
                   />
                   <label for="instance-filter-dropdown">Found Instances:</label>
                   <select id="instance-filter-dropdown">
-                    <option value=""></option>
+                    <option value="">All Instances</option>
                   </select>
                 </div>
               </div>
               <div class="row">
                 <div class="col-sm-10">
-                  <label for="blacklist-ids-incoming" style="width: 80px"
-                    >Blacklist Methods</label
+                  <div style="display: inline-block; margin-right: 10px;">
+                    <select id="filter-mode" style="padding: 3px;">
+                      <option value="blacklist">Blacklist</option>
+                      <option value="whitelist">Whitelist</option>
+                    </select>
+                  </div>
+                  <label for="method-filter-ids" id="filter-label" style="width: 80px"
+                    >Methods</label
                   >
                   <input
                     type="text"
-                    id="blacklist-ids-incoming"
+                    id="method-filter-ids"
                     placeholder="5026,1601,1103,..."
-                    style="width: calc(100% - 83px)"
+                    style="width: calc(100% - 200px)"
                   />
                 </div>
                 <div class="col-sm-2">
@@ -203,7 +209,8 @@
       let messages = [];
       let foundInstances = [];
       let instanceFilter = "";
-      let incomingBlacklistIds = [];
+      let methodFilterIds = [];
+      let filterMode = "blacklist";
       incoming.on("protos", function (data) {
         if (foundInstances.indexOf(data.identifier) === -1) {
           foundInstances.push(data.identifier);
@@ -212,11 +219,16 @@
         if (STATE !== 1) {
           return;
         }
-        if (instanceFilter == "" || data.identifier !== instanceFilter) {
+        if (instanceFilter !== "" && data.identifier !== instanceFilter) {
           return;
         }
-        if (incomingBlacklistIds.length > 0) {
-          if (incomingBlacklistIds.indexOf(data.methodId) !== -1) {
+        if (methodFilterIds.length > 0) {
+          const methodIdNum = parseInt(data.methodId);
+          const isInList = methodFilterIds.indexOf(methodIdNum) !== -1;
+          if (filterMode === "blacklist" && isInList) {
+            return;
+          }
+          if (filterMode === "whitelist" && !isInList) {
             return;
           }
         }
@@ -260,12 +272,17 @@
         if (STATE !== 1) {
           return;
         }
-        if (incomingBlacklistIds.length > 0) {
-          if (incomingBlacklistIds.indexOf(data.methodId) !== -1) {
+        if (methodFilterIds.length > 0) {
+          const methodIdNum = parseInt(data.methodId);
+          const isInList = methodFilterIds.indexOf(methodIdNum) !== -1;
+          if (filterMode === "blacklist" && isInList) {
+            return;
+          }
+          if (filterMode === "whitelist" && !isInList) {
             return;
           }
         }
-        if (instanceFilter == "" || data.identifier !== instanceFilter) {
+        if (instanceFilter !== "" && data.identifier !== instanceFilter) {
           return;
         }
         if (typeof data.error !== "undefined") {
@@ -456,14 +473,20 @@
         instanceFilter = $(this).val();
         storeSettings();
       });
-      $("#blacklist-ids-incoming").keyup(function () {
-        incomingBlacklistIds =
+      $("#method-filter-ids").keyup(function () {
+        methodFilterIds =
           $(this).val() === ""
             ? []
             : $(this)
                 .val()
                 .split(",")
                 .map((x) => parseInt(x));
+        storeSettings();
+      });
+
+      $("#filter-mode").change(function () {
+        filterMode = $(this).val();
+        clearTable();
         storeSettings();
       });
       $("#maxlogs").on("change", function () {
@@ -482,8 +505,16 @@
         if (settingsJson !== null) {
           const settings = JSON.parse(settingsJson);
           (STATE = parseInt(settings["STATE"])),
-            (instanceFilter = settings["instanceFilter"]),
-            (incomingBlacklistIds = settings["incomingBlacklistIds"]);
+            (instanceFilter = settings["instanceFilter"]);
+          // Handle legacy blacklist settings
+          if (settings["incomingBlacklistIds"]) {
+            methodFilterIds = settings["incomingBlacklistIds"];
+          } else if (settings["methodFilterIds"]) {
+            methodFilterIds = settings["methodFilterIds"];
+          }
+          if (settings["filterMode"]) {
+            filterMode = settings["filterMode"];
+          }
           if (settings["maxLogs"] != null && !isNaN(parseInt(maxLogs))) {
             setLogValue(parseInt(settings["maxLogs"]));
           }
@@ -495,7 +526,8 @@
             $("#play-button").click();
           }
           $("#instance-filter").val(instanceFilter);
-          $("#blacklist-ids-incoming").val(incomingBlacklistIds.join(","));
+          $("#method-filter-ids").val(methodFilterIds.join(","));
+          $("#filter-mode").val(filterMode);
         }
         $("#maxlogs").val(maxLogs);
       }
@@ -506,7 +538,8 @@
           JSON.stringify({
             STATE: STATE,
             instanceFilter: instanceFilter,
-            incomingBlacklistIds: incomingBlacklistIds,
+            methodFilterIds: methodFilterIds,
+            filterMode: filterMode,
             maxLogs: maxLogs,
             darkMode: darkMode
           })
