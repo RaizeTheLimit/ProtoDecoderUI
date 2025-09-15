@@ -96,11 +96,14 @@
               >
                 <thead>
                   <tr>
-                    <th>Instance</th>
+                    <th class="mobile-hide">Instance</th>
                     <th>Method</th>
                     <th>Method Name</th>
-                    <th>Sended Data</th>
-                    <th>Received Data</th>
+                    <th class="mobile-hide">Sended Data</th>
+                    <th class="mobile-hide">Received Data</th>
+                    <th class="mobile-only">Req</th>
+                    <th class="mobile-only">Res</th>
+                    <th class="mobile-only">DL</th>
                   </tr>
                 </thead>
                 <tbody></tbody>
@@ -132,10 +135,10 @@
           </div>
           <div class="modal-body">
             <p>Method name: <span class="method-name"></span></p>
-            <p>Request data (Sent to server):</p>
-            <pre class="method-data-incoming"></pre>
-            <p>Response data (Received from server):</p>
-            <pre class="method-data-outgoing"></pre>
+            <p>Request data (Sent to server): <small style="color: #666;">(Click to copy)</small></p>
+            <pre class="method-data-incoming clickable-data" style="cursor: pointer; position: relative;"></pre>
+            <p>Response data (Received from server): <small style="color: #666;">(Click to copy)</small></p>
+            <pre class="method-data-outgoing clickable-data" style="cursor: pointer; position: relative;"></pre>
           </div>
           <div class="modal-footer">
             <button
@@ -191,6 +194,7 @@
           this.methodId = obj.methodId;
           this.methodName = obj.methodName;
           this.responseHtmlElement = null;
+          this.responseStatusElement = null;
           this.response = null;
         }
         setResponse(obj) {
@@ -211,6 +215,40 @@
       let instanceFilter = "";
       let methodFilterIds = [];
       let filterMode = "blacklist";
+
+      function downloadJSON(data, filename) {
+        const jsonStr = JSON.stringify(data, null, 2);
+        const blob = new Blob([jsonStr], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      }
+
+      function showToast(message, isError = false) {
+        const bgColor = isError ? '#dc3545' : '#28a745';
+        const toast = $(`<div style="position: fixed; bottom: 20px; right: 20px; background: ${bgColor}; color: white; padding: 12px 20px; border-radius: 5px; font-size: 14px; z-index: 9999; box-shadow: 0 2px 10px rgba(0,0,0,0.2);">${message}</div>`);
+        $('body').append(toast);
+        toast.hide().fadeIn(300);
+        setTimeout(function() {
+          toast.fadeOut(300, function() {
+            toast.remove();
+          });
+        }, 2000);
+      }
+
+      function copyToClipboard(text) {
+        navigator.clipboard.writeText(text).then(function() {
+          showToast('Copied to clipboard!');
+        }).catch(function(err) {
+          console.error('Failed to copy: ', err);
+          showToast('Failed to copy to clipboard', true);
+        });
+      }
       incoming.on("protos", function (data) {
         if (foundInstances.indexOf(data.identifier) === -1) {
           foundInstances.push(data.identifier);
@@ -240,25 +278,72 @@
           messages.push(message);
           const tr = document.createElement("tr");
           tr.setAttribute("id", message.id);
-          const parameters = [
-            "identifier",
-            "methodId",
-            "methodName",
-            "data",
-            null,
-          ];
-          parameters.forEach((el) => {
-            const td = document.createElement("td");
-            if (el != null) {
-              if (el == "data") td.innerHTML = objectToReadable(message[el]);
-              else td.innerText = message[el];
-              if (el == "methodId") td.classList.add("important");
-            } else {
-              td.innerText = "Waiting data...";
-              message.responseHtmlElement = td;
-            }
-            tr.appendChild(td);
-          });
+
+          const tdInstance = document.createElement("td");
+          tdInstance.classList.add("mobile-hide");
+          tdInstance.innerText = message.identifier;
+          tr.appendChild(tdInstance);
+
+          const tdMethodId = document.createElement("td");
+          tdMethodId.innerText = message.methodId;
+          tdMethodId.classList.add("important");
+          tr.appendChild(tdMethodId);
+
+          const tdMethodName = document.createElement("td");
+          tdMethodName.innerText = message.methodName;
+          tr.appendChild(tdMethodName);
+
+          const tdData = document.createElement("td");
+          tdData.classList.add("mobile-hide");
+          tdData.innerHTML = objectToReadable(message.data);
+          tr.appendChild(tdData);
+
+          const tdResponse = document.createElement("td");
+          tdResponse.classList.add("mobile-hide");
+          tdResponse.innerText = "Waiting data...";
+          message.responseHtmlElement = tdResponse;
+          tr.appendChild(tdResponse);
+
+          const tdReqStatus = document.createElement("td");
+          tdReqStatus.classList.add("mobile-only", "text-center");
+          const reqCopyBtn = document.createElement("button");
+          reqCopyBtn.innerHTML = '<i class="fas fa-copy"></i>';
+          reqCopyBtn.style.cssText = "padding: 4px; font-size: 14px; border: none; background: transparent; color: #007bff; cursor: pointer;";
+          reqCopyBtn.onclick = function(e) {
+            e.stopPropagation();
+            const jsonStr = JSON.stringify(message.data, null, 2);
+            copyToClipboard(jsonStr);
+          };
+          tdReqStatus.appendChild(reqCopyBtn);
+          tr.appendChild(tdReqStatus);
+
+          const tdResStatus = document.createElement("td");
+          tdResStatus.classList.add("mobile-only", "text-center");
+          tdResStatus.innerHTML = '<span style="color: red;">✗</span>';
+          message.responseStatusElement = tdResStatus;
+          tr.appendChild(tdResStatus);
+
+          const tdDownload = document.createElement("td");
+          tdDownload.classList.add("mobile-only", "text-center");
+          const downloadBtn = document.createElement("button");
+          downloadBtn.innerHTML = '<i class="fas fa-download"></i>';
+          downloadBtn.style.cssText = "padding: 4px; font-size: 14px; border: none; background: transparent; color: #28a745; cursor: pointer;";
+          downloadBtn.onclick = function(e) {
+            e.stopPropagation(); // Prevent row click
+            const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
+            const filename = `combined_${message.methodName}_${message.methodId}_${timestamp}.json`;
+            const combinedData = {
+              identifier: message.identifier,
+              methodId: message.methodId,
+              methodName: message.methodName,
+              request: message.data,
+              response: message.response ? message.response.data : null
+            };
+            downloadJSON(combinedData, filename);
+          };
+          tdDownload.appendChild(downloadBtn);
+          tr.appendChild(tdDownload);
+
           $("#data_socket tbody").prepend(tr);
           if ($("#data_socket tbody").children().length > maxLogs)
             $("#data_socket tbody").children().last().remove();
@@ -300,6 +385,18 @@
           incomingMessage.responseHtmlElement.innerHTML = objectToReadable(
             data.data
           );
+          if (incomingMessage.responseStatusElement) {
+            incomingMessage.responseStatusElement.innerHTML = '';
+            const resCopyBtn = document.createElement("button");
+            resCopyBtn.innerHTML = '<i class="fas fa-copy"></i>';
+            resCopyBtn.style.cssText = "padding: 4px; font-size: 14px; border: none; background: transparent; color: #007bff; cursor: pointer;";
+            resCopyBtn.onclick = function(e) {
+              e.stopPropagation();
+              const jsonStr = JSON.stringify(data.data, null, 2);
+              copyToClipboard(jsonStr);
+            };
+            incomingMessage.responseStatusElement.appendChild(resCopyBtn);
+          }
         }
       });
       let currentModalMessage = null;
@@ -317,19 +414,6 @@
           .jsonViewer(message.response.data);
         $("#modal-detail").modal();
       });
-      function downloadJSON(data, filename) {
-        const jsonStr = JSON.stringify(data, null, 2);
-        const blob = new Blob([jsonStr], { type: "application/json" });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = filename;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-      }
-
       $("#download-incoming-json").click(function () {
         if (!currentModalMessage) return;
         const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
@@ -356,6 +440,20 @@
           response: currentModalMessage.response ? currentModalMessage.response.data : null
         };
         downloadJSON(combinedData, filename);
+      });
+
+      $(document).on('click', '.method-data-incoming', function(e) {
+        if (currentModalMessage && currentModalMessage.data) {
+          const jsonStr = JSON.stringify(currentModalMessage.data, null, 2);
+          copyToClipboard(jsonStr);
+        }
+      });
+
+      $(document).on('click', '.method-data-outgoing', function(e) {
+        if (currentModalMessage && currentModalMessage.response && currentModalMessage.response.data) {
+          const jsonStr = JSON.stringify(currentModalMessage.response.data, null, 2);
+          copyToClipboard(jsonStr);
+        }
       });
 
       $("#darkmode-button").click(function () {

@@ -2,6 +2,7 @@ import http from "http";
 import fs from "fs";
 import { WebStreamBuffer, getIPAddress, handleData, moduleConfigIsAvailable, redirect_post_golbat } from "./utils";
 import { decodePayload, decodePayloadTraffic } from "./parser/proto-parser";
+import SampleSaver from "./utils/sample-saver";
 
 // try looking if config file exists...
 let config = require("./config/example.config.json");
@@ -13,6 +14,9 @@ if (moduleConfigIsAvailable()) {
 const incomingProtoWebBufferInst = new WebStreamBuffer();
 const outgoingProtoWebBufferInst = new WebStreamBuffer();
 const portBind = config["default_port"];
+
+// Initialize sample saver
+const sampleSaver = config.sample_saving ? new SampleSaver(config.sample_saving) : null;
 
 // server
 const httpServer = http.createServer(function (req, res) {
@@ -44,11 +48,25 @@ const httpServer = http.createServer(function (req, res) {
                 }
                 const identifier = parsedData['username'];
                 for (let i = 0; i < parsedData['contents'].length; i++) {
+                    const rawRequest = parsedData['contents'][i].request || "";
+                    const rawResponse = parsedData['contents'][i].payload || "";
+
                     const parsedRequestData = decodePayloadTraffic(
                         parsedData['contents'][i].type,
-                        parsedData['contents'][i].request,
+                        rawRequest,
                         "request"
                     );
+                    const parsedResponseData = decodePayloadTraffic(
+                        parsedData['contents'][i].type,
+                        rawResponse,
+                        "response"
+                    );
+
+                    // Save sample if enabled
+                    if (sampleSaver && parsedRequestData.length > 0 && parsedResponseData.length > 0) {
+                        sampleSaver.savePair(parsedRequestData[0], parsedResponseData[0], rawRequest, rawResponse, "golbat");
+                    }
+
                     if (typeof parsedRequestData === "string") {
                         incomingProtoWebBufferInst.write({ error: parsedRequestData });
                     } else {
@@ -57,11 +75,7 @@ const httpServer = http.createServer(function (req, res) {
                             incomingProtoWebBufferInst.write(parsedObject);
                         }
                     }
-                    const parsedResponseData = decodePayloadTraffic(
-                        parsedData['contents'][i].type,
-                        parsedData['contents'][i].payload,
-                        "response"
-                    );
+
                     if (typeof parsedResponseData === "string") {
                         outgoingProtoWebBufferInst.write({ error: parsedResponseData });
                     } else {
@@ -85,10 +99,10 @@ const httpServer = http.createServer(function (req, res) {
                 res.end("");
                 if (Array.isArray(parsedData)) {
                     for (let i = 0; i < parsedData.length; i++) {
-                        handleData(incomingProtoWebBufferInst, outgoingProtoWebBufferInst, identifier, parsedData[i])
+                        handleData(incomingProtoWebBufferInst, outgoingProtoWebBufferInst, identifier, parsedData[i], sampleSaver)
                     }
                 } else {
-                    handleData(incomingProtoWebBufferInst, outgoingProtoWebBufferInst, identifier, parsedData)
+                    handleData(incomingProtoWebBufferInst, outgoingProtoWebBufferInst, identifier, parsedData, sampleSaver)
                 }
             });
             break;

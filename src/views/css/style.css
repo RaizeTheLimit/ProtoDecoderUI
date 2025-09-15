@@ -119,3 +119,115 @@ table tr td.important {
 	border-top: 2px solid rgba(255, 255, 255, 0.5);
 	width: 100%;
 }
+
+/* Mobile styles - hide by default */
+.mobile-only {
+	display: none !important;
+}
+
+.text-center {
+	text-align: center;
+}
+
+.clickable-data:hover {
+	background-color: rgba(0, 123, 255, 0.05) !important;
+	border: 1px solid rgba(0, 123, 255, 0.2);
+	transition: all 0.2s ease;
+}
+
+.dark .clickable-data:hover {
+	background-color: rgba(0, 123, 255, 0.1) !important;
+	border: 1px solid rgba(0, 123, 255, 0.3);
+}
+
+/* Mobile breakpoint */
+@media (max-width: 768px) {
+	.mobile-hide {
+		display: none !important;
+	}
+
+	.mobile-only {
+		display: table-cell !important;
+	}
+
+	/* Optimize table for mobile */
+	#data_socket {
+		font-size: smaller;
+	}
+
+	#data_socket th,
+	#data_socket td {
+		padding: 4px !important;
+		font-size: 11px;
+	}
+
+	/* Make method name wrap on mobile */
+	#data_socket td:nth-child(3) {
+		word-break: break-word;
+		max-width: 120px;
+	}
+
+	/* Filters optimization for mobile */
+	.col-sm-10, .col-sm-2 {
+		padding: 5px !important;
+	}
+
+	#filter-mode, #instance-filter-dropdown, #maxlogs {
+		width: 100% !important;
+		margin-bottom: 5px;
+	}
+
+	#method-filter-ids {
+		width: 100% !important;
+		margin-top: 5px;
+	}
+
+	label {
+		display: block !important;
+		width: 100% !important;
+		margin-bottom: 3px;
+	}
+
+	/* Card header for mobile */
+	.card-header .title-proto {
+		font-size: 16px !important;
+	}
+
+	.card-header .icons i {
+		font-size: 12px !important;
+		margin-right: 8px !important;
+	}
+
+	/* Footer for mobile */
+	.footer {
+		font-size: 10px;
+		padding: 5px;
+	}
+
+	/* Modal optimization for mobile */
+	.modal-dialog {
+		max-width: 95% !important;
+		margin: 10px auto !important;
+	}
+
+	.modal-content {
+		margin: 0 auto;
+	}
+
+	.modal-body {
+		padding: 10px !important;
+		max-height: 70vh;
+		overflow-y: auto;
+	}
+
+	.modal-footer {
+		padding: 10px !important;
+		flex-wrap: wrap;
+	}
+
+	.modal-footer button {
+		margin: 3px !important;
+		font-size: 12px !important;
+		padding: 5px 10px !important;
+	}
+}
