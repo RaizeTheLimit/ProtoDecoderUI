@@ -33,13 +33,24 @@ export function getIPAddress() {
     return '0.0.0.0';
 }
 
-export function handleData(incoming: WebStreamBuffer, outgoing: WebStreamBuffer, identifier: any, parsedData: string) {
+export function handleData(incoming: WebStreamBuffer, outgoing: WebStreamBuffer, identifier: any, parsedData: string, sampleSaver?: any) {
     for (let i = 0; i < parsedData['protos'].length; i++) {
         const parsedRequestData = decodePayloadTraffic(
             parsedData['protos'][i].method,
             parsedData['protos'][i].request,
             "request"
         );
+        const parsedResponseData = decodePayloadTraffic(
+            parsedData['protos'][i].method,
+            parsedData['protos'][i].response,
+            "response"
+        );
+
+        // Save sample if enabled
+        if (sampleSaver && parsedRequestData.length > 0 && parsedResponseData.length > 0) {
+            sampleSaver.savePair(parsedRequestData[0], parsedResponseData[0], "traffic");
+        }
+
         if (typeof parsedRequestData === "string") {
             incoming.write({ error: parsedRequestData });
         } else {
@@ -48,11 +59,7 @@ export function handleData(incoming: WebStreamBuffer, outgoing: WebStreamBuffer,
                 incoming.write(parsedObject);
             }
         }
-        const parsedResponseData = decodePayloadTraffic(
-            parsedData['protos'][i].method,
-            parsedData['protos'][i].response,
-            "response"
-        );
+
         if (typeof parsedResponseData === "string") {
             outgoing.write({ error: parsedResponseData });
         } else {

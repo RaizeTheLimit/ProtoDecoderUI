@@ -2,5 +2,11 @@
   "default_port": 8081,
   "trafficlight_identifier": "AwesomeProtoSender",
   "redirect_to_golbat_url": null,
-  "redirect_to_golbat_token": null
+  "redirect_to_golbat_token": null,
+  "sample_saving": {
+    "enabled": true,
+    "save_directory": "./proto_samples",
+    "max_samples_per_method": 1,
+    "endpoints": ["traffic", "golbat"]
+  }
 }
