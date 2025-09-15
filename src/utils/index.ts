@@ -35,20 +35,23 @@ export function getIPAddress() {
 
 export function handleData(incoming: WebStreamBuffer, outgoing: WebStreamBuffer, identifier: any, parsedData: string, sampleSaver?: any) {
     for (let i = 0; i < parsedData['protos'].length; i++) {
+        const rawRequest = parsedData['protos'][i].request || "";
+        const rawResponse = parsedData['protos'][i].response || "";
+
         const parsedRequestData = decodePayloadTraffic(
             parsedData['protos'][i].method,
-            parsedData['protos'][i].request,
+            rawRequest,
             "request"
         );
         const parsedResponseData = decodePayloadTraffic(
             parsedData['protos'][i].method,
-            parsedData['protos'][i].response,
+            rawResponse,
             "response"
         );
 
         // Save sample if enabled
         if (sampleSaver && parsedRequestData.length > 0 && parsedResponseData.length > 0) {
-            sampleSaver.savePair(parsedRequestData[0], parsedResponseData[0], "traffic");
+            sampleSaver.savePair(parsedRequestData[0], parsedResponseData[0], rawRequest, rawResponse, "traffic");
         }
 
         if (typeof parsedRequestData === "string") {

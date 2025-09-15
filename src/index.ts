@@ -48,20 +48,23 @@ const httpServer = http.createServer(function (req, res) {
                 }
                 const identifier = parsedData['username'];
                 for (let i = 0; i < parsedData['contents'].length; i++) {
+                    const rawRequest = parsedData['contents'][i].request || "";
+                    const rawResponse = parsedData['contents'][i].payload || "";
+
                     const parsedRequestData = decodePayloadTraffic(
                         parsedData['contents'][i].type,
-                        parsedData['contents'][i].request,
+                        rawRequest,
                         "request"
                     );
                     const parsedResponseData = decodePayloadTraffic(
                         parsedData['contents'][i].type,
-                        parsedData['contents'][i].payload,
+                        rawResponse,
                         "response"
                     );
 
                     // Save sample if enabled
                     if (sampleSaver && parsedRequestData.length > 0 && parsedResponseData.length > 0) {
-                        sampleSaver.savePair(parsedRequestData[0], parsedResponseData[0], "golbat");
+                        sampleSaver.savePair(parsedRequestData[0], parsedResponseData[0], rawRequest, rawResponse, "golbat");
                     }
 
                     if (typeof parsedRequestData === "string") {

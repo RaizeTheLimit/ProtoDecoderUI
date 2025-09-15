@@ -15,6 +15,8 @@ interface SavedSample {
     timestamp: string;
     request: any;
     response: any;
+    rawRequest: string;
+    rawResponse: string;
 }
 
 interface SampleFile {
@@ -101,7 +103,13 @@ class SampleSaver {
         return true;
     }
 
-    public async saveSample(request: DecodedProto, response: DecodedProto | null, endpoint: string): Promise<void> {
+    public async saveSample(
+        request: DecodedProto,
+        response: DecodedProto | null,
+        rawRequest: string,
+        rawResponse: string,
+        endpoint: string
+    ): Promise<void> {
         if (!request || !request.methodId) return;
         if (!this.shouldSave(endpoint)) return;
 
@@ -117,7 +125,9 @@ class SampleSaver {
             methodName: request.methodName,
             timestamp: this.getTimestamp(),
             request: request.data,
-            response: response ? response.data : null
+            response: response ? response.data : null,
+            rawRequest: rawRequest,
+            rawResponse: rawResponse
         };
 
         const safeMethodName = request.methodName.replace(/[^a-zA-Z0-9_-]/g, '_');
@@ -144,8 +154,14 @@ class SampleSaver {
         }
     }
 
-    public async savePair(request: DecodedProto, response: DecodedProto, endpoint: string): Promise<void> {
-        await this.saveSample(request, response, endpoint);
+    public async savePair(
+        request: DecodedProto,
+        response: DecodedProto,
+        rawRequest: string,
+        rawResponse: string,
+        endpoint: string
+    ): Promise<void> {
+        await this.saveSample(request, response, rawRequest, rawResponse, endpoint);
     }
 }
 
