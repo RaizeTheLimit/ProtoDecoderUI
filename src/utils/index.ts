@@ -5,6 +5,9 @@ import { WebStreamBuffer } from "./web-stream-buffer";
 import { decodePayloadTraffic } from "../parser/proto-parser";
 
 export const b64Decode = (data: string) => {
+    if (!data || data === "") {
+        return Buffer.alloc(0);
+    }
     return Buffer.from(data, "base64");
 };
 
