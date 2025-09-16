@@ -408,6 +408,8 @@ export const requestMessagesResponses = {
 	REQUEST_TYPE_METHOD_COMPLETE_TEAM_LEADER_BATTLE: [3060, POGOProtos.Rpc.CompleteTeamLeaderBattleProto, POGOProtos.Rpc.CompleteTeamLeaderBattleOutProto],
 	REQUEST_TYPE_METHOD_GET_DEBUG_ENCOUNTER_STATISTICS_ACTION: [3061, POGOProtos.Rpc.DebugEncounterStatisticsProto, POGOProtos.Rpc.DebugEncounterStatisticsOutProto],
 	REQUEST_TYPE_METHOD_REJOIN_BATTLE_CHECK: [3062, POGOProtos.Rpc.CheckBattleRejoinProto, POGOProtos.Rpc.CheckBattleRejoinOutProto],
+	REQUEST_TYPE_METHOD_COMPLETE_ALL_QUEST: [3063, POGOProtos.Rpc.CompleteAllQuestProto, POGOProtos.Rpc.CompleteAllQuestOutProto],
+	REQUEST_TYPE_METHOD_LEAVE_WEEKLY_CHALLENGE_MATCHMAKING: [3064, POGOProtos.Rpc.LeaveWeeklyChallengeMatchmakingProto, POGOProtos.Rpc.LeaveWeeklyChallengeMatchmakingOutProto],
 	REQUEST_TYPE_PLATFORM_REGISTER_PUSH_NOTIFICATION: [5000, POGOProtos.Rpc.PushNotificationRegistryProto, POGOProtos.Rpc.PushNotificationRegistryOutProto],
 	REQUEST_TYPE_PLATFORM_UNREGISTER_PUSH_NOTIFICATION: [5001, null, null],
 	REQUEST_TYPE_PLATFORM_UPDATE_NOTIFICATION_STATUS: [5002, POGOProtos.Rpc.UpdateNotificationProto, POGOProtos.Rpc.UpdateNotificationOutProto],
