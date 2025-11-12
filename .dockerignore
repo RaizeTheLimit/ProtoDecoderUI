@@ -1,0 +1,55 @@
+# Dependencies
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Build output
+dist/
+
+# Proto samples (will be mounted as volume)
+proto_samples/
+
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# Documentation
+*.md
+README*
+CHANGELOG*
+LICENSE*
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment
+.env
+.env.*
+
+# Testing
+coverage/
+.nyc_output/
+
+# Docker
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# CI/CD
+.github/
+.gitlab-ci.yml
+.travis.yml
+
+# Misc
+*.log
+tmp/
+temp/
