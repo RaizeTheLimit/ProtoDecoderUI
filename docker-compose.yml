@@ -7,7 +7,7 @@ services:
     ports:
       - "8081:8081"
     volumes:
-      - ./src/config/config.json:/app/src/config/config.json:ro
+      - ./src/config/config.json:/app/dist/config/config.json:ro
       - ./proto_samples:/app/proto_samples
     restart: unless-stopped
     environment:

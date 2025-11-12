@@ -133,27 +133,37 @@ const httpServer = http.createServer(function (req, res) {
                 incomingData.push(chunk);
             });
             req.on("end", function () {
-                const requestData = incomingData.join("");
-                let parsedData = JSON.parse(requestData);
-                res.writeHead(200, { "Content-Type": "application/json" });
-                res.end("");
-                if (Array.isArray(parsedData)) {
-                    console.error("Incoming Data is an array, need to be single object");
-                    return;
-                }
-                // redirect because endpoint is in use there, leave null to ignore.
-                // ex http://123.123.123.123:9001/raw
-                // this need a test ping ok or throw for better.
-                if (config["redirect_to_golbat_url"]) {
-                    try {
-                        redirect_post_golbat(config["redirect_to_golbat_url"], config["redirect_to_golbat_token"], JSON.stringify(parsedData));
+                try {
+                    const requestData = incomingData.join("");
+                    let parsedData = JSON.parse(requestData);
+                    res.writeHead(200, { "Content-Type": "application/json" });
+                    res.end("");
+                    if (Array.isArray(parsedData)) {
+                        console.error("Incoming Data is an array, need to be single object");
+                        return;
                     }
-                    catch (err) {
-                        console.error("Endpoint golbat offline or bad!" + err);
+                    // Validate required fields
+                    if (!parsedData['contents'] || !Array.isArray(parsedData['contents'])) {
+                        console.error("Invalid golbat data: 'contents' field missing or not an array");
+                        return;
                     }
-                }
-                const identifier = parsedData['username'];
-                for (let i = 0; i < parsedData['contents'].length; i++) {
+                    if (parsedData['contents'].length === 0) {
+                        console.error("Invalid golbat data: 'contents' array is empty");
+                        return;
+                    }
+                    // redirect because endpoint is in use there, leave null to ignore.
+                    // ex http://123.123.123.123:9001/raw
+                    // this need a test ping ok or throw for better.
+                    if (config["redirect_to_golbat_url"]) {
+                        try {
+                            redirect_post_golbat(config["redirect_to_golbat_url"], config["redirect_to_golbat_token"], JSON.stringify(parsedData));
+                        }
+                        catch (err) {
+                            console.error("Endpoint golbat offline or bad!" + err);
+                        }
+                    }
+                    const identifier = parsedData['username'];
+                    for (let i = 0; i < parsedData['contents'].length; i++) {
                     const rawRequest = parsedData['contents'][i].request || "";
                     const rawResponse = parsedData['contents'][i].payload || "";
 
@@ -191,6 +201,9 @@ const httpServer = http.createServer(function (req, res) {
                         }
                     }
                 }
+                } catch (error) {
+                    console.error("Error processing golbat request:", error);
+                }
             });
             break;
         case "/traffic":
@@ -217,25 +230,34 @@ const httpServer = http.createServer(function (req, res) {
                 incomingData.push(chunk);
             });
             req.on("end", () => {
-                const requestData = incomingData.join("");
-                let parsedData = JSON.parse(requestData);
-                res.writeHead(200, { "Content-Type": "application/json" });
-                res.end("");
-                const parsedResponseData = decodePayload(
-                    parsedData.contents,
-                    "response"
-                );
-                if (typeof parsedResponseData === "string") {
-                    incomingProtoWebBufferInst.write({ error: parsedResponseData });
-                } else {
-                    for (let parsedObject of parsedResponseData) {
-                        parsedObject.identifier =
-                            parsedData["uuid"] ||
-                            parsedData["devicename"] ||
-                            parsedData["deviceName"] ||
-                            parsedData["instanceName"];
-                        incomingProtoWebBufferInst.write(parsedObject);
+                try {
+                    const requestData = incomingData.join("");
+                    let parsedData = JSON.parse(requestData);
+                    res.writeHead(200, { "Content-Type": "application/json" });
+                    res.end("");
+                    // Validate required fields
+                    if (!parsedData.contents) {
+                        console.error("Invalid raw data: 'contents' field missing");
+                        return;
                     }
+                    const parsedResponseData = decodePayload(
+                        parsedData.contents,
+                        "response"
+                    );
+                    if (typeof parsedResponseData === "string") {
+                        incomingProtoWebBufferInst.write({ error: parsedResponseData });
+                    } else {
+                        for (let parsedObject of parsedResponseData) {
+                            parsedObject.identifier =
+                                parsedData["uuid"] ||
+                                parsedData["devicename"] ||
+                                parsedData["deviceName"] ||
+                                parsedData["instanceName"];
+                            incomingProtoWebBufferInst.write(parsedObject);
+                        }
+                    }
+                } catch (error) {
+                    console.error("Error processing raw request:", error);
                 }
             });
             break;
@@ -244,22 +266,31 @@ const httpServer = http.createServer(function (req, res) {
                 incomingData.push(chunk);
             });
             req.on("end", function () {
-                const requestData = incomingData.join("");
-                let parsedData = JSON.parse(requestData);
-                res.writeHead(200, { "Content-Type": "application/json" });
-                res.end("");
-                const parsedRequestData = decodePayload(parsedData.contents, "request");
-                if (typeof parsedRequestData === "string") {
-                    outgoingProtoWebBufferInst.write({ error: parsedRequestData });
-                } else {
-                    for (let parsedObject of parsedRequestData) {
-                        parsedObject.identifier =
-                            parsedData["uuid"] ||
-                            parsedData["devicename"] ||
-                            parsedData["deviceName"] ||
-                            parsedData["instanceName"];
-                        outgoingProtoWebBufferInst.write(parsedObject);
+                try {
+                    const requestData = incomingData.join("");
+                    let parsedData = JSON.parse(requestData);
+                    res.writeHead(200, { "Content-Type": "application/json" });
+                    res.end("");
+                    // Validate required fields
+                    if (!parsedData.contents) {
+                        console.error("Invalid debug data: 'contents' field missing");
+                        return;
                     }
+                    const parsedRequestData = decodePayload(parsedData.contents, "request");
+                    if (typeof parsedRequestData === "string") {
+                        outgoingProtoWebBufferInst.write({ error: parsedRequestData });
+                    } else {
+                        for (let parsedObject of parsedRequestData) {
+                            parsedObject.identifier =
+                                parsedData["uuid"] ||
+                                parsedData["devicename"] ||
+                                parsedData["deviceName"] ||
+                                parsedData["instanceName"];
+                            outgoingProtoWebBufferInst.write(parsedObject);
+                        }
+                    }
+                } catch (error) {
+                    console.error("Error processing debug request:", error);
                 }
             });
             break;

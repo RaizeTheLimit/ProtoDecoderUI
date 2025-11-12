@@ -39,8 +39,10 @@ RUN yarn install --frozen-lockfile --production --ignore-scripts
 # Copy built application from builder stage
 COPY --from=builder /app/dist ./dist
 
-# Copy source config directory structure (for config.json mount point)
-COPY --from=builder /app/src/config/example.config.json ./src/config/
+# Copy config directory structure (for config.json mount point)
+# Note: example.config.json is already in dist/config/ from the build process
+# This ensures the directory structure exists for the volume mount
+COPY --from=builder /app/dist/config/example.config.json ./dist/config/
 
 # Create proto_samples directory
 RUN mkdir -p proto_samples
