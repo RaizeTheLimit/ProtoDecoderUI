@@ -1,0 +1,20 @@
+services:
+  protodecoder-ui:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: protodecoder-ui
+    ports:
+      - "8081:8081"
+    volumes:
+      - ./src/config/config.json:/app/dist/config/config.json:ro
+      - ./proto_samples:/app/proto_samples
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:8081/', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"]
+      interval: 30s
+      timeout: 10s
+      start_period: 5s
+      retries: 3

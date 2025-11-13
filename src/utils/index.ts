@@ -34,6 +34,15 @@ export function getIPAddress() {
 }
 
 export function handleData(incoming: WebStreamBuffer, outgoing: WebStreamBuffer, identifier: any, parsedData: string, sampleSaver?: any) {
+    // Validate required fields
+    if (!parsedData['protos'] || !Array.isArray(parsedData['protos'])) {
+        console.error("Invalid traffic data: 'protos' field missing or not an array");
+        return;
+    }
+    if (parsedData['protos'].length === 0) {
+        console.error("Invalid traffic data: 'protos' array is empty");
+        return;
+    }
     for (let i = 0; i < parsedData['protos'].length; i++) {
         const rawRequest = parsedData['protos'][i].request || "";
         const rawResponse = parsedData['protos'][i].response || "";

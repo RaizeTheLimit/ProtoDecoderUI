@@ -45,6 +45,7 @@
                 <i class="fas fa-play" id="play-button"></i>
                 <i class="fas fa-pause" id="pause-button"></i>
                 <i class="fas fa-trash" id="clear-button"></i>
+                <i class="fas fa-sign-out-alt" id="logout-button" style="display: none;" title="Logout"></i>
               </div>
             </h4>
             <div class="card-body">
@@ -484,6 +485,22 @@
       $("#clear-button").click(function () {
         clearTable();
       });
+      $("#logout-button").click(async function () {
+        if (confirm("Are you sure you want to logout?")) {
+          try {
+            await fetch("/auth/logout", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+            });
+            window.location.href = "/login";
+          } catch (error) {
+            console.error("Logout error:", error);
+            alert("Failed to logout. Please try again.");
+          }
+        }
+      });
       function clearTable() {
         $("#data_socket tbody tr").remove();
         messages = [];
@@ -630,6 +647,19 @@
         $("#maxlogs").val(maxLogs);
       }
       loadSettings();
+
+      // Check if authentication is enabled and show logout button
+      fetch("/auth/status")
+        .then(response => response.json())
+        .then(data => {
+          if (data.authRequired) {
+            document.getElementById("logout-button").style.display = "inline-block";
+          }
+        })
+        .catch(error => {
+          console.log("Could not check auth status:", error);
+        });
+
       function storeSettings() {
         localStorage.setItem(
           "settings",

@@ -1,5 +1,6 @@
 {
   "default_port": 8081,
+  "web_password": null,
   "trafficlight_identifier": "AwesomeProtoSender",
   "redirect_to_golbat_url": null,
   "redirect_to_golbat_token": null,

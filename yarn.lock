@@ -15,9 +15,9 @@
     wrap-ansi-cjs "npm:wrap-ansi@^7.0.0"
 
 "@na-ji/pogo-protos@^2.131.0":
-  version "2.205.0"
-  resolved "https://registry.yarnpkg.com/@na-ji/pogo-protos/-/pogo-protos-2.205.0.tgz#7001f8cbe65c2c5de697308b28833b076003076b"
-  integrity sha512-9riW9iEODcRMQ1p5pUIFvkwGT/6iVw7vmHnSmAYVAZ1rNG2cM/28aR7MEi4UJNbZPF69atOz8IKdetJHblHndg==
+  version "2.208.0"
+  resolved "https://registry.yarnpkg.com/@na-ji/pogo-protos/-/pogo-protos-2.208.0.tgz#170c28ea91d4cc5072fd48970a6dc95468b7174b"
+  integrity sha512-L4jUB7J+7DspAGDMYe8nC0i0F2R5UoipB021NeNfUQe0Yt1siosvOYafqErBrXd6XxG8T5Iyq0OY+YX6FcT1xw==
   dependencies:
     protobufjs "^6.11.4"
 
@@ -96,10 +96,17 @@
   resolved "https://registry.yarnpkg.com/@types/long/-/long-4.0.2.tgz#b74129719fc8d11c01868010082d483b7545591a"
   integrity sha512-MqTGEo5bj5t157U6fA/BiDynNkn0YknVdh48CMPkTSpFTVmvao5UQmm7uEF6xBEo7qIMAlY/JSleYaE6VOdpaA==
 
-"@types/node@*", "@types/node@>=10.0.0", "@types/node@>=13.7.0":
+"@types/node@*", "@types/node@>=10.0.0":
   version "24.9.2"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-24.9.2.tgz#90ded2422dbfcafcf72080f28975adc21366148d"
   integrity sha512-uWN8YqxXxqFMX2RqGOrumsKeti4LlmIMIyV0lgut4jx7KQBcBiW6vkDtIBvHnHIquwNfJhk8v2OtmO8zXWHfPA==
+  dependencies:
+    undici-types "~7.16.0"
+
+"@types/node@>=13.7.0":
+  version "24.10.1"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-24.10.1.tgz#91e92182c93db8bd6224fca031e2370cef9a8f01"
+  integrity sha512-GNWcUTRBgIRJD5zj+Tq0fKOJ5XZajIiBroOF0yvj2bSU1WvNdYS/dn9UxwsujGW4JX06dnHyjV2y9rRaybH0iQ==
   dependencies:
     undici-types "~7.16.0"
 
