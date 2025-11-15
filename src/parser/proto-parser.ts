@@ -1,8 +1,25 @@
 import { b64Decode } from "../utils";
 import { requestMessagesResponses } from "../constants";
 import { DecodedProto } from "../types";
+import POGOProtos from "@na-ji/pogo-protos";
 
 let action_social = 0;
+let action_gar_proxy = 0;
+
+function DecoderInternalGarPayloadAsResponse(method: number, data: any): any {
+    action_gar_proxy = 0;
+    if (!data) {
+        return {};
+    }
+
+    switch (method) {
+        case 4:
+            return POGOProtos.Rpc.InternalCreateSharedLoginTokenResponse.decode(b64Decode(data)).toJSON();
+        default:
+            return { Not_Implemented_yet: data, method: method };
+    }
+}
+
 function DecoderInternalPayloadAsResponse(method: number, data: any): any {
     action_social = 0;
     let proto_tuple: any = Object.values(requestMessagesResponses)[method];
@@ -88,7 +105,7 @@ export const decodeProto = (method: number, data: string, dataType: string): Dec
                     } else {
                         parsedData = foundMethod[1].decode(b64Decode(data)).toJSON();
                     }
-                    if (foundMethod[0] === 5012 || foundMethod[0] === 600005) {
+                    if (foundMethod[0] === 5012) {
                         action_social = parsedData.action;
                         Object.values(requestMessagesResponses).forEach(val => {
                             let req: any = val;
@@ -96,6 +113,17 @@ export const decodeProto = (method: number, data: string, dataType: string): Dec
                                 parsedData.payload = req[1].decode(b64Decode(parsedData.payload)).toJSON();
                             }
                         });
+                    }
+                    else if (foundMethod[0] === 600005) {
+                        action_gar_proxy = parsedData.action;
+                        switch (action_gar_proxy) {
+                            case 4:
+                                parsedData.payload = POGOProtos.Rpc.InternalGarAccountInfoProto.decode(b64Decode(parsedData.payload)).toJSON();
+                                break;
+                            default:
+                                break;
+                        }
+
                     }
                     returnObject = {
                         methodId: foundMethod[0],
@@ -136,8 +164,8 @@ export const decodeProto = (method: number, data: string, dataType: string): Dec
                     if (foundMethod[0] === 5012 && action_social > 0 && parsedData.payload) {
                         parsedData.payload = DecoderInternalPayloadAsResponse(action_social, parsedData.payload);
                     }
-                    else if (foundMethod[0] === 600005 && action_social > 0 && parsedData.payload) {
-                        parsedData.payload = DecoderInternalPayloadAsResponse(action_social, parsedData.payload);
+                    else if (foundMethod[0] === 600005 && action_gar_proxy > 0 && parsedData.payload) {
+                        parsedData.payload = DecoderInternalGarPayloadAsResponse(action_gar_proxy, parsedData.payload);
                     }
                     returnObject = {
                         methodId: foundMethod[0],

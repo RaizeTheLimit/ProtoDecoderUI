@@ -15,9 +15,9 @@
     wrap-ansi-cjs "npm:wrap-ansi@^7.0.0"
 
 "@na-ji/pogo-protos@^2.131.0":
-  version "2.205.0"
-  resolved "https://registry.yarnpkg.com/@na-ji/pogo-protos/-/pogo-protos-2.205.0.tgz#7001f8cbe65c2c5de697308b28833b076003076b"
-  integrity sha512-9riW9iEODcRMQ1p5pUIFvkwGT/6iVw7vmHnSmAYVAZ1rNG2cM/28aR7MEi4UJNbZPF69atOz8IKdetJHblHndg==
+  version "2.209.0"
+  resolved "https://registry.yarnpkg.com/@na-ji/pogo-protos/-/pogo-protos-2.209.0.tgz#ab44722a6e400a9ad7f3e6cbbf05738c042b6615"
+  integrity sha512-TVL0DAkK8khYPo9SOvKrj50mzFLmV/C8bPbUxEI8r8igU6f4Y7ehkGEnbaJ0P65lHI7W5g6oSTX9TXbhOe13fg==
   dependencies:
     protobufjs "^6.11.4"
 
@@ -97,16 +97,16 @@
   integrity sha512-MqTGEo5bj5t157U6fA/BiDynNkn0YknVdh48CMPkTSpFTVmvao5UQmm7uEF6xBEo7qIMAlY/JSleYaE6VOdpaA==
 
 "@types/node@*", "@types/node@>=10.0.0", "@types/node@>=13.7.0":
-  version "24.9.2"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-24.9.2.tgz#90ded2422dbfcafcf72080f28975adc21366148d"
-  integrity sha512-uWN8YqxXxqFMX2RqGOrumsKeti4LlmIMIyV0lgut4jx7KQBcBiW6vkDtIBvHnHIquwNfJhk8v2OtmO8zXWHfPA==
+  version "24.10.1"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-24.10.1.tgz#91e92182c93db8bd6224fca031e2370cef9a8f01"
+  integrity sha512-GNWcUTRBgIRJD5zj+Tq0fKOJ5XZajIiBroOF0yvj2bSU1WvNdYS/dn9UxwsujGW4JX06dnHyjV2y9rRaybH0iQ==
   dependencies:
     undici-types "~7.16.0"
 
 "@types/node@^20.3.1":
-  version "20.19.24"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-20.19.24.tgz#6bc35bc96cda1a251000b706c76380b5c843f30b"
-  integrity sha512-FE5u0ezmi6y9OZEzlJfg37mqqf6ZDSF2V/NLjUyGrR9uTZ7Sb9F7bLNZ03S4XVUNRWGA7Ck4c1kK+YnuWjl+DA==
+  version "20.19.25"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-20.19.25.tgz#467da94a2fd966b57cc39c357247d68047611190"
+  integrity sha512-ZsJzA5thDQMSQO788d7IocwwQbI8B5OPzmqNvpf3NY/+MHDAS759Wo0gd2WQeXYt5AAAQjzcrTVC6SKCuYgoCQ==
   dependencies:
     undici-types "~6.21.0"
 
