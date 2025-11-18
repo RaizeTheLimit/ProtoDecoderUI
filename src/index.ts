@@ -2,8 +2,9 @@ import http from "http";
 import fs from "fs";
 import crypto from "crypto";
 import { WebStreamBuffer, getIPAddress, handleData, moduleConfigIsAvailable, redirect_post_golbat } from "./utils";
-import { decodePayload, decodePayloadTraffic } from "./parser/proto-parser";
+import { decodePayload, decodePayloadTraffic, remasterOrCleanMethodString } from "./parser/proto-parser";
 import SampleSaver from "./utils/sample-saver";
+import { requestMessagesResponses } from "./constants";
 
 // try looking if config file exists...
 let config = require("./config/example.config.json");
@@ -124,6 +125,23 @@ const httpServer = http.createServer(function (req, res) {
     if (req.url === "/auth/status" && req.method === "GET") {
         res.writeHead(200, { "Content-Type": "application/json" });
         res.end(JSON.stringify({ authRequired: AUTH_REQUIRED }));
+        return;
+    }
+
+    if (req.url === "/api/methods" && req.method === "GET") {
+        if (!requireAuth(req, res)) return;
+
+        // Build complete method list from constants
+        const methodsList = Object.entries(requestMessagesResponses).map(([rawName, tuple]) => ({
+            id: String(tuple[0]),                          // Method ID as string
+            rawName: rawName,                              // Original constant name
+            cleanName: remasterOrCleanMethodString(rawName), // Cleaned display name
+            hasRequest: tuple[1] !== null,                 // Has request proto
+            hasResponse: tuple[2] !== null                 // Has response proto
+        }));
+
+        res.writeHead(200, { "Content-Type": "application/json" });
+        res.end(JSON.stringify(methodsList));
         return;
     }
 

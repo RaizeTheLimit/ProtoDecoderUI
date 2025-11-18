@@ -32,6 +32,7 @@
       type="text/css"
       rel="stylesheet"
     />
+    <script src="https://cdn.jsdelivr.net/npm/js-yaml@4"></script>
   </head>
   <body class="p-2">
     <div class="container-fluid">
@@ -51,7 +52,7 @@
             <div class="card-body">
               <div class="row">
                 <div class="col-md-12">Filters</div>
-                <div class="col-md-12">
+                <div class="col-md-8 col-sm-6">
                   <label for="instance-filter">Instance</label>
                   <input
                     type="text"
@@ -63,31 +64,22 @@
                     <option value="">All Instances</option>
                   </select>
                 </div>
-              </div>
-              <div class="row">
-                <div class="col-sm-10">
-                  <div style="display: inline-block; margin-right: 10px;">
-                    <select id="filter-mode" style="padding: 3px;">
-                      <option value="blacklist">Blacklist</option>
-                      <option value="whitelist">Whitelist</option>
-                    </select>
-                  </div>
-                  <label for="method-filter-ids" id="filter-label" style="width: 80px"
-                    >Methods</label
-                  >
-                  <input
-                    type="text"
-                    id="method-filter-ids"
-                    placeholder="5026,1601,1103,..."
-                    style="width: calc(100% - 200px)"
-                  />
-                </div>
-                <div class="col-sm-2">
-                  <label for="maxlogs" style="width: 40px">Maxlogs</label>
+                <div class="col-md-4 col-sm-6">
+                  <label for="maxlogs" style="display: inline-block; margin-right: 5px;">Max Logs</label>
                   <select
                     id="maxlogs"
-                    style="width: calc(100% - 43px); padding: 3px"
+                    style="padding: 3px; width: auto; min-width: 100px;"
                   ></select>
+                </div>
+              </div>
+              <div class="row" style="margin-top: 10px;">
+                <div class="col-md-6 col-sm-12">
+                  <!-- Enhanced Method Filter Panel (injected by JavaScript) -->
+                  <div id="method-filter-wrapper"></div>
+                </div>
+                <div class="col-md-6 col-sm-12">
+                  <!-- Statistics Panel (injected by JavaScript) -->
+                  <div id="statistics-wrapper"></div>
                 </div>
               </div>
               <table
@@ -142,24 +134,31 @@
             <pre class="method-data-outgoing clickable-data" style="cursor: pointer; position: relative;"></pre>
           </div>
           <div class="modal-footer">
+            <div style="margin-right: auto; display: flex; align-items: center;">
+              <label style="margin: 0 8px 0 0; font-weight: normal;">Format:</label>
+              <select id="export-format-modal" style="padding: 3px;">
+                <option value="json">JSON</option>
+                <option value="yaml">YAML</option>
+              </select>
+            </div>
             <button
               type="button"
               class="btn btn-primary"
-              id="download-incoming-json"
+              id="download-incoming"
             >
               <i class="fas fa-download"></i> Download Request
             </button>
             <button
               type="button"
               class="btn btn-primary"
-              id="download-outgoing-json"
+              id="download-outgoing"
             >
               <i class="fas fa-download"></i> Download Response
             </button>
             <button
               type="button"
               class="btn btn-success"
-              id="download-combined-json"
+              id="download-combined"
             >
               <i class="fas fa-download"></i> Download Both
             </button>
@@ -197,11 +196,24 @@
           this.responseHtmlElement = null;
           this.responseStatusElement = null;
           this.response = null;
+          this.timestamp = Date.now(); // First-seen timestamp
         }
         setResponse(obj) {
           this.response = obj;
         }
       }
+
+      // =========================
+      // Session Tracking State
+      // =========================
+      const rowFirstSeen = new Map(); // row ID -> first-seen timestamp
+      const methodCounts = new Map(); // method ID -> count (session only)
+      let allowedMethods = new Set(); // Set of allowed method IDs (for filtering)
+      let knownMethods = new Set(); // All discovered methods (persistent)
+      let methodMap = new Map(); // method ID -> method name mapping
+      let isUserTyping = false;
+      let globalIsComposing = false;
+      let showSeenMethodsOnly = false; // Toggle: show all methods vs. seen only
       var STATE = 0;
       setStateOnButtons();
       var incoming = io.connect("/incoming"),
@@ -214,12 +226,38 @@
       let messages = [];
       let foundInstances = [];
       let instanceFilter = "";
-      let methodFilterIds = [];
-      let filterMode = "blacklist";
+      let exportFormat = "json"; // Default export format
+      let sessionStartTime = Date.now();
 
-      function downloadJSON(data, filename) {
-        const jsonStr = JSON.stringify(data, null, 2);
-        const blob = new Blob([jsonStr], { type: "application/json" });
+      // =========================
+      // Utility Functions
+      // =========================
+      function sleep(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+      }
+
+      function fmtStamp(ms) {
+        return new Date(ms).toISOString().replace(/[:-]/g, "").slice(0, 15);
+      }
+
+      function downloadFile(data, filename, format = "json") {
+        let content, mimeType;
+        if (format === "yaml") {
+          try {
+            content = jsyaml.dump(data, { noRefs: true });
+            mimeType = "text/yaml;charset=utf-8";
+          } catch (e) {
+            console.error("YAML conversion failed:", e);
+            showToast("YAML export failed, using JSON instead", true);
+            content = JSON.stringify(data, null, 2);
+            mimeType = "application/json";
+            filename = filename.replace(/\.yaml$/, ".json");
+          }
+        } else {
+          content = JSON.stringify(data, null, 2);
+          mimeType = "application/json";
+        }
+        const blob = new Blob([content], { type: mimeType });
         const url = URL.createObjectURL(blob);
         const a = document.createElement("a");
         a.href = url;
@@ -228,6 +266,10 @@
         a.click();
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
+      }
+
+      function downloadJSON(data, filename) {
+        downloadFile(data, filename, "json");
       }
 
       function showToast(message, isError = false) {
@@ -255,21 +297,31 @@
           foundInstances.push(data.identifier);
           appendFoundName(data.identifier);
         }
+
+        // Track methods (only update if not already loaded from server)
+        const methodId = String(data.methodId);
+        if (!methodMap.has(methodId)) {
+          methodMap.set(methodId, data.methodName);
+          knownMethods.add(methodId);
+          saveMethodMap();
+          saveKnownMethods();
+
+          // Auto-check new methods by default
+          if (!allowedMethods.has(methodId)) {
+            allowedMethods.add(methodId);
+            saveAllowedMethods();
+          }
+        }
+
         if (STATE !== 1) {
           return;
         }
         if (instanceFilter !== "" && data.identifier !== instanceFilter) {
           return;
         }
-        if (methodFilterIds.length > 0) {
-          const methodIdNum = parseInt(data.methodId);
-          const isInList = methodFilterIds.indexOf(methodIdNum) !== -1;
-          if (filterMode === "blacklist" && isInList) {
-            return;
-          }
-          if (filterMode === "whitelist" && !isInList) {
-            return;
-          }
+        // Use new allowedMethods set for filtering
+        if (allowedMethods.size > 0 && !allowedMethods.has(methodId)) {
+          return;
         }
         if (typeof data.error !== "undefined") {
           console.error(data.error);
@@ -277,8 +329,17 @@
           incomingProtocolId++;
           const message = new IncomingMessage(incomingProtocolId, data);
           messages.push(message);
+
+          // Track first-seen and counts
+          const rowId = String(incomingProtocolId);
+          if (!rowFirstSeen.has(rowId)) {
+            rowFirstSeen.set(rowId, message.timestamp);
+            methodCounts.set(methodId, (methodCounts.get(methodId) || 0) + 1);
+          }
+
           const tr = document.createElement("tr");
           tr.setAttribute("id", message.id);
+          tr.setAttribute("data-method-id", methodId);
 
           const tdInstance = document.createElement("td");
           tdInstance.classList.add("mobile-hide");
@@ -331,8 +392,9 @@
           downloadBtn.style.cssText = "padding: 4px; font-size: 14px; border: none; background: transparent; color: #28a745; cursor: pointer;";
           downloadBtn.onclick = function(e) {
             e.stopPropagation(); // Prevent row click
-            const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
-            const filename = `combined_${message.methodName}_${message.methodId}_${timestamp}.json`;
+            const ext = exportFormat === "yaml" ? "yaml" : "json";
+            const timestamp = fmtStamp(message.timestamp);
+            const filename = `${message.methodName}_${timestamp}_${message.id}_combined.${ext}`;
             const combinedData = {
               identifier: message.identifier,
               methodId: message.methodId,
@@ -340,7 +402,7 @@
               request: message.data,
               response: message.response ? message.response.data : null
             };
-            downloadJSON(combinedData, filename);
+            downloadFile(combinedData, filename, exportFormat);
           };
           tdDownload.appendChild(downloadBtn);
           tr.appendChild(tdDownload);
@@ -355,18 +417,28 @@
           foundInstances.push(data.identifier);
           appendFoundName(data.identifier);
         }
+
+        // Track methods (only update if not already loaded from server)
+        const methodId = String(data.methodId);
+        if (!methodMap.has(methodId)) {
+          methodMap.set(methodId, data.methodName);
+          knownMethods.add(methodId);
+          saveMethodMap();
+          saveKnownMethods();
+
+          // Auto-check new methods by default
+          if (!allowedMethods.has(methodId)) {
+            allowedMethods.add(methodId);
+            saveAllowedMethods();
+          }
+        }
+
         if (STATE !== 1) {
           return;
         }
-        if (methodFilterIds.length > 0) {
-          const methodIdNum = parseInt(data.methodId);
-          const isInList = methodFilterIds.indexOf(methodIdNum) !== -1;
-          if (filterMode === "blacklist" && isInList) {
-            return;
-          }
-          if (filterMode === "whitelist" && !isInList) {
-            return;
-          }
+        // Use new allowedMethods set for filtering
+        if (allowedMethods.size > 0 && !allowedMethods.has(methodId)) {
+          return;
         }
         if (instanceFilter !== "" && data.identifier !== instanceFilter) {
           return;
@@ -415,24 +487,30 @@
           .jsonViewer(message.response.data);
         $("#modal-detail").modal();
       });
-      $("#download-incoming-json").click(function () {
+      $("#download-incoming").click(function () {
         if (!currentModalMessage) return;
-        const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
-        const filename = `request_${currentModalMessage.methodName}_${currentModalMessage.methodId}_${timestamp}.json`;
-        downloadJSON(currentModalMessage.data, filename);
+        const format = $("#export-format-modal").val() || exportFormat;
+        const ext = format === "yaml" ? "yaml" : "json";
+        const timestamp = fmtStamp(currentModalMessage.timestamp);
+        const filename = `${currentModalMessage.methodName}_${timestamp}_${currentModalMessage.id}_req.${ext}`;
+        downloadFile(currentModalMessage.data, filename, format);
       });
 
-      $("#download-outgoing-json").click(function () {
+      $("#download-outgoing").click(function () {
         if (!currentModalMessage || !currentModalMessage.response) return;
-        const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
-        const filename = `response_${currentModalMessage.methodName}_${currentModalMessage.methodId}_${timestamp}.json`;
-        downloadJSON(currentModalMessage.response.data, filename);
+        const format = $("#export-format-modal").val() || exportFormat;
+        const ext = format === "yaml" ? "yaml" : "json";
+        const timestamp = fmtStamp(currentModalMessage.timestamp);
+        const filename = `${currentModalMessage.methodName}_${timestamp}_${currentModalMessage.id}_resp.${ext}`;
+        downloadFile(currentModalMessage.response.data, filename, format);
       });
 
-      $("#download-combined-json").click(function () {
+      $("#download-combined").click(function () {
         if (!currentModalMessage) return;
-        const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
-        const filename = `combined_${currentModalMessage.methodName}_${currentModalMessage.methodId}_${timestamp}.json`;
+        const format = $("#export-format-modal").val() || exportFormat;
+        const ext = format === "yaml" ? "yaml" : "json";
+        const timestamp = fmtStamp(currentModalMessage.timestamp);
+        const filename = `${currentModalMessage.methodName}_${timestamp}_${currentModalMessage.id}_combined.${ext}`;
         const combinedData = {
           identifier: currentModalMessage.identifier,
           methodId: currentModalMessage.methodId,
@@ -440,7 +518,7 @@
           request: currentModalMessage.data,
           response: currentModalMessage.response ? currentModalMessage.response.data : null
         };
-        downloadJSON(combinedData, filename);
+        downloadFile(combinedData, filename, format);
       });
 
       $(document).on('click', '.method-data-incoming', function(e) {
@@ -588,20 +666,10 @@
         instanceFilter = $(this).val();
         storeSettings();
       });
-      $("#method-filter-ids").keyup(function () {
-        methodFilterIds =
-          $(this).val() === ""
-            ? []
-            : $(this)
-                .val()
-                .split(",")
-                .map((x) => parseInt(x));
-        storeSettings();
-      });
 
-      $("#filter-mode").change(function () {
-        filterMode = $(this).val();
-        clearTable();
+      // Export format modal selector
+      $("#export-format-modal").change(function () {
+        exportFormat = $(this).val();
         storeSettings();
       });
       $("#maxlogs").on("change", function () {
@@ -619,33 +687,116 @@
         let settingsJson = localStorage.getItem("settings");
         if (settingsJson !== null) {
           const settings = JSON.parse(settingsJson);
-          (STATE = parseInt(settings["STATE"])),
-            (instanceFilter = settings["instanceFilter"]);
-          // Handle legacy blacklist settings
-          if (settings["incomingBlacklistIds"]) {
-            methodFilterIds = settings["incomingBlacklistIds"];
-          } else if (settings["methodFilterIds"]) {
-            methodFilterIds = settings["methodFilterIds"];
-          }
-          if (settings["filterMode"]) {
-            filterMode = settings["filterMode"];
-          }
-          if (settings["maxLogs"] != null && !isNaN(parseInt(maxLogs))) {
+          STATE = parseInt(settings["STATE"] || 0);
+          instanceFilter = settings["instanceFilter"] || "";
+
+          if (settings["maxLogs"] != null && !isNaN(parseInt(settings["maxLogs"]))) {
             setLogValue(parseInt(settings["maxLogs"]));
           }
           if(settings["darkMode"] != null && JSON.parse(settings["darkMode"])) {
             darkMode = true;
             document.body.classList.add("dark");
           }
+          if (settings["exportFormat"]) {
+            exportFormat = settings["exportFormat"];
+            $("#export-format-modal").val(exportFormat);
+          }
+          if (settings["showSeenMethodsOnly"] != null) {
+            showSeenMethodsOnly = settings["showSeenMethodsOnly"];
+          }
+
           if (STATE === 1) {
             $("#play-button").click();
           }
           $("#instance-filter").val(instanceFilter);
-          $("#method-filter-ids").val(methodFilterIds.join(","));
-          $("#filter-mode").val(filterMode);
         }
         $("#maxlogs").val(maxLogs);
       }
+
+      // Load persistent method tracking data
+      function loadAllowedMethods() {
+        try {
+          const data = JSON.parse(localStorage.getItem("allowedMethods") || "[]");
+          return new Set(data.map(String));
+        } catch {
+          return new Set();
+        }
+      }
+
+      function saveAllowedMethods() {
+        localStorage.setItem("allowedMethods", JSON.stringify([...allowedMethods]));
+      }
+
+      function loadKnownMethods() {
+        try {
+          const data = JSON.parse(localStorage.getItem("knownMethods") || "[]");
+          return new Set(data.map(String));
+        } catch {
+          return new Set();
+        }
+      }
+
+      function saveKnownMethods() {
+        localStorage.setItem("knownMethods", JSON.stringify([...knownMethods]));
+      }
+
+      function loadMethodMap() {
+        try {
+          const data = JSON.parse(localStorage.getItem("methodMap") || "{}");
+          return new Map(Object.entries(data));
+        } catch {
+          return new Map();
+        }
+      }
+
+      function saveMethodMap() {
+        localStorage.setItem("methodMap", JSON.stringify(Object.fromEntries(methodMap)));
+      }
+
+      // =========================
+      // Load Complete Method List from Server
+      // =========================
+      async function loadAllMethodsFromServer() {
+        try {
+          const response = await fetch('/api/methods');
+          if (!response.ok) throw new Error('Failed to fetch methods');
+
+          const allMethods = await response.json();
+
+          console.log(`📋 Loaded ${allMethods.length} methods from server`);
+
+          // Populate methodMap with all available methods
+          allMethods.forEach(method => {
+            methodMap.set(method.id, method.cleanName);
+            knownMethods.add(method.id);
+
+            // Auto-check all methods by default
+            if (!allowedMethods.has(method.id)) {
+              allowedMethods.add(method.id);
+            }
+          });
+
+          // Save to localStorage
+          saveMethodMap();
+          saveKnownMethods();
+          saveAllowedMethods();
+
+          // Refresh UI
+          renderMethodFilterPanel();
+
+          return true;
+        } catch (error) {
+          console.error('❌ Failed to load methods from server:', error);
+          showToast('Failed to load complete method list', true);
+          return false;
+        }
+      }
+
+      // Initialize from localStorage
+      allowedMethods = loadAllowedMethods();
+      knownMethods = loadKnownMethods();
+      methodMap = loadMethodMap();
+
       loadSettings();
 
       // Check if authentication is enabled and show logout button
@@ -666,13 +817,339 @@
           JSON.stringify({
             STATE: STATE,
             instanceFilter: instanceFilter,
-            methodFilterIds: methodFilterIds,
-            filterMode: filterMode,
             maxLogs: maxLogs,
-            darkMode: darkMode
+            darkMode: darkMode,
+            exportFormat: exportFormat,
+            showSeenMethodsOnly: showSeenMethodsOnly
           })
         );
       }
+
+      // =========================
+      // Input Detection (Smart UI Updates)
+      // =========================
+      function isEditableTarget(el) {
+        if (!el) return false;
+        const tag = el.tagName;
+        if (tag === "TEXTAREA") return true;
+        if (tag === "INPUT") {
+          const t = (el.type || "text").toLowerCase();
+          return ["text", "search", "email", "url", "tel", "password", "number", ""].includes(t);
+        }
+        return !!el.isContentEditable;
+      }
+
+      function checkUserTyping() {
+        const ae = document.activeElement;
+        return globalIsComposing || isEditableTarget(ae);
+      }
+
+      document.addEventListener("compositionstart", (e) => {
+        if (isEditableTarget(e.target)) globalIsComposing = true;
+      }, true);
+
+      document.addEventListener("compositionend", (e) => {
+        if (isEditableTarget(e.target)) globalIsComposing = false;
+      }, true);
+
+      // =========================
+      // Row Highlighting
+      // =========================
+      function updateRowHighlighting() {
+        document.querySelectorAll("#data_socket tbody tr").forEach((row) => {
+          const methodId = row.getAttribute("data-method-id");
+          if (methodId) {
+            const isAllowed = allowedMethods.has(methodId);
+            row.classList.toggle("proto-disabled", !isAllowed);
+          }
+        });
+      }
+
+      // =========================
+      // Statistics Panel
+      // =========================
+      function renderStatisticsPanel() {
+        const wrapper = document.getElementById("statistics-wrapper");
+        if (!wrapper) return;
+
+        const totalMethodsAvailable = methodMap.size;  // From server (complete list)
+        const totalMethodsSeen = methodCounts.size;    // From traffic (this session)
+        const totalProtos = messages.length;
+        const uptime = Math.floor((Date.now() - sessionStartTime) / 1000);
+        const uptimeStr = `${Math.floor(uptime / 60)}m ${uptime % 60}s`;
+
+        wrapper.innerHTML = `
+          <div class="statistics-panel">
+            <div class="stat-header">
+              <strong>Session Statistics</strong>
+              <button id="stats-toggle" class="stat-toggle">▼</button>
+            </div>
+            <div id="stats-content" class="stat-content">
+              <div class="stat-item"><span class="stat-label">Session Uptime:</span> <span class="stat-value">${uptimeStr}</span></div>
+              <div class="stat-item"><span class="stat-label">Methods Available:</span> <span class="stat-value">${totalMethodsAvailable}</span></div>
+              <div class="stat-item"><span class="stat-label">Methods Seen:</span> <span class="stat-value">${totalMethodsSeen}</span></div>
+              <div class="stat-item"><span class="stat-label">Total Protos:</span> <span class="stat-value">${totalProtos}</span></div>
+            </div>
+          </div>
+        `;
+
+        // Toggle functionality
+        $("#stats-toggle").off("click").on("click", function() {
+          const content = $("#stats-content");
+          const btn = $(this);
+          if (content.is(":visible")) {
+            content.slideUp();
+            btn.text("▲");
+          } else {
+            content.slideDown();
+            btn.text("▼");
+          }
+        });
+      }
+
+      // =========================
+      // Enhanced Method Filter Panel
+      // =========================
+      function renderMethodFilterPanel() {
+        const wrapper = document.getElementById("method-filter-wrapper");
+        if (!wrapper) return;
+
+        const savedSearch = localStorage.getItem("methodFilterSearch") || "";
+
+        wrapper.innerHTML = `
+          <div class="method-filter-panel">
+            <div class="filter-header">
+              <strong>Method Filter</strong>
+              <small style="margin-left: 10px; opacity: 0.7;">(Uncheck to skip export)</small>
+
+              <button id="seen-only-toggle" class="filter-toggle" style="margin-left: auto; margin-right: 5px;" title="${showSeenMethodsOnly ? 'Showing only methods seen in traffic (click to show all)' : 'Showing all available methods (click to show seen only)'}">
+                <i class="fas ${showSeenMethodsOnly ? 'fa-eye' : 'fa-list'}"></i>
+              </button>
+
+              <button id="refresh-methods-btn" class="filter-toggle" style="margin-right: 5px;" title="Reload methods from server">
+                <i class="fas fa-sync-alt"></i>
+              </button>
+              <button id="filter-toggle" class="filter-toggle">▼</button>
+            </div>
+            <div id="filter-content" class="filter-content">
+              <input type="text" id="method-search" class="method-search" placeholder="Search Method ID or Name..." value="${savedSearch}" />
+              <div id="method-list" class="method-list"></div>
+            </div>
+          </div>
+        `;
+
+        // Render method list
+        renderMethodList(savedSearch);
+
+        // Search handler with IME support
+        let searchIsComposing = false;
+        $("#method-search").on("compositionstart", function() {
+          searchIsComposing = true;
+        });
+        $("#method-search").on("compositionend", function() {
+          searchIsComposing = false;
+          const query = $(this).val();
+          localStorage.setItem("methodFilterSearch", query);
+          renderMethodList(query);
+        });
+        $("#method-search").on("input", function() {
+          if (!searchIsComposing) {
+            const query = $(this).val();
+            localStorage.setItem("methodFilterSearch", query);
+            renderMethodList(query);
+          }
+        });
+
+        // Refresh methods button
+        $("#refresh-methods-btn").off("click").on("click", async function() {
+          const icon = $(this).find("i");
+          icon.addClass("fa-spin");
+          await loadAllMethodsFromServer();
+          icon.removeClass("fa-spin");
+          showToast('Methods refreshed from server');
+        });
+
+        // Seen-only toggle handler
+        $("#seen-only-toggle").off("click").on("click", function() {
+          showSeenMethodsOnly = !showSeenMethodsOnly;
+          storeSettings();
+
+          // Update button icon and tooltip
+          const icon = $(this).find("i");
+          icon.removeClass("fa-eye fa-list");
+          icon.addClass(showSeenMethodsOnly ? "fa-eye" : "fa-list");
+          $(this).attr("title", showSeenMethodsOnly
+            ? "Showing only methods seen in traffic (click to show all)"
+            : "Showing all available methods (click to show seen only)");
+
+          // Re-render the method list with new filter
+          const searchQuery = $("#method-search").val() || "";
+          renderMethodList(searchQuery);
+
+          // Show toast to indicate what's being displayed
+          if (showSeenMethodsOnly) {
+            showToast(`Showing ${methodCounts.size} methods seen in traffic`);
+          } else {
+            showToast(`Showing all ${methodMap.size} available methods`);
+          }
+        });
+
+        // Toggle functionality
+        $("#filter-toggle").off("click").on("click", function() {
+          const content = $("#filter-content");
+          const btn = $(this);
+          if (content.is(":visible")) {
+            content.slideUp();
+            btn.text("▲");
+          } else {
+            content.slideDown();
+            btn.text("▼");
+          }
+        });
+      }
+
+      function renderMethodList(filterText = "") {
+        const listEl = document.getElementById("method-list");
+        if (!listEl) return;
+
+        const filter = filterText.toLowerCase();
+        const entries = Array.from(methodMap.entries())
+          .filter(([id, name]) => {
+            // If "Seen Only" is enabled, only show methods that have been seen
+            if (showSeenMethodsOnly && !methodCounts.has(id)) {
+              return false;
+            }
+
+            // Apply search filter
+            if (!filter) return true;
+            return id.includes(filter) || name.toLowerCase().includes(filter);
+          })
+          .sort((a, b) => parseInt(a[0]) - parseInt(b[0]));
+
+        listEl.innerHTML = "";
+
+        // Show message if no methods match
+        if (entries.length === 0) {
+          const emptyMsg = document.createElement("div");
+          emptyMsg.style.cssText = "padding: 20px; text-align: center; opacity: 0.6; font-style: italic;";
+          emptyMsg.textContent = showSeenMethodsOnly
+            ? "No methods seen in traffic yet"
+            : "No methods found";
+          listEl.appendChild(emptyMsg);
+          updateRowHighlighting();
+          return;
+        }
+
+        entries.forEach(([id, name]) => {
+          const count = methodCounts.get(id) || 0;
+          const isChecked = allowedMethods.has(id);
+
+          const item = document.createElement("label");
+          item.className = "proto-item" + (isChecked ? " selected" : "");
+          item.setAttribute("role", "checkbox");
+          item.setAttribute("tabindex", "0");
+
+          const checkbox = document.createElement("input");
+          checkbox.type = "checkbox";
+          checkbox.checked = isChecked;
+
+          const spanId = document.createElement("span");
+          spanId.className = "proto-id";
+          spanId.textContent = id;
+
+          const spanName = document.createElement("span");
+          spanName.className = "proto-name";
+          spanName.textContent = name || "Unnamed";
+
+          const badge = document.createElement("span");
+          badge.className = "proto-badge";
+          badge.textContent = count;
+
+          item.appendChild(checkbox);
+          item.appendChild(spanId);
+          item.appendChild(spanName);
+          item.appendChild(badge);
+          listEl.appendChild(item);
+
+          // Toggle handler
+          function applyToggle(nextChecked) {
+            if (nextChecked) {
+              allowedMethods.add(id);
+              saveAllowedMethods();
+              updateRowHighlighting();
+            } else {
+              allowedMethods.delete(id);
+              saveAllowedMethods();
+              updateRowHighlighting();
+            }
+            checkbox.checked = allowedMethods.has(id);
+            item.classList.toggle("selected", allowedMethods.has(id));
+          }
+
+          item.addEventListener("click", (e) => {
+            if (e.target === checkbox) return;
+            e.preventDefault();
+            applyToggle(!allowedMethods.has(id));
+          });
+
+          checkbox.addEventListener("change", () => applyToggle(checkbox.checked));
+
+          item.addEventListener("keydown", (e) => {
+            if (e.key === " " || e.key === "Enter") {
+              e.preventDefault();
+              applyToggle(!allowedMethods.has(id));
+            }
+          });
+        });
+
+        updateRowHighlighting();
+      }
+
+      // =========================
+      // Session Management
+      // =========================
+      function resetSessionCache() {
+        rowFirstSeen.clear();
+        methodCounts.clear();
+        sessionStartTime = Date.now();
+        console.log("✦ Session cache cleared");
+        renderStatisticsPanel();
+        renderMethodFilterPanel();
+      }
+
+      // =========================
+      // Global API
+      // =========================
+      window.__protoWatcher__ = {
+        rowFirstSeen,
+        methodCounts,
+        allowedMethods,
+        knownMethods,
+        methodMap,
+        resetSessionCache,
+        renderMethodFilterPanel,
+        renderStatisticsPanel
+      };
+
+      // =========================
+      // Initialization
+      // =========================
+      $(document).ready(async function() {
+        // Load complete method list from server first
+        await loadAllMethodsFromServer();
+
+        // Then render UI
+        renderMethodFilterPanel();
+        renderStatisticsPanel();
+
+        // Periodic UI refresh (when not typing)
+        setInterval(() => {
+          if (!checkUserTyping()) {
+            renderMethodFilterPanel();
+            renderStatisticsPanel();
+          }
+        }, 10000); // Every 10 seconds
+      });
     </script>
   </body>
 </html>
