@@ -51,7 +51,7 @@ function DecoderInternalPayloadAsResponse(method: number, data: any): any {
     return result;
 }
 
-function remasterOrCleanMethodString(str: string) {
+export function remasterOrCleanMethodString(str: string) {
     return str.replace(/^REQUEST_TYPE_/, '')
         .replace(/^METHOD_/, '')
         .replace(/^PLATFORM_/, '')
