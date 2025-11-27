@@ -51,7 +51,7 @@ function DecoderInternalPayloadAsResponse(method: number, data: any): any {
     return result;
 }
 
-function remasterOrCleanMethodString(str: string) {
+export function remasterOrCleanMethodString(str: string) {
     return str.replace(/^REQUEST_TYPE_/, '')
         .replace(/^METHOD_/, '')
         .replace(/^PLATFORM_/, '')
@@ -205,6 +205,126 @@ export const decodeProto = (method: number, data: string, dataType: string): Dec
             data: {
                 error: "Unknown method ID",
                 rawBase64: data
+            },
+        };
+    }
+
+    return returnObject;
+};
+
+// Decode proto from raw bytes (not base64 encoded) - used for PolygonX endpoint
+export const decodeProtoFromBytes = (method: number, data: Uint8Array, dataType: string): DecodedProto | string => {
+    let returnObject: DecodedProto | string = "Not Found";
+    let methodFound = false;
+
+    for (let i = 0; i < Object.keys(requestMessagesResponses).length; i++) {
+        let foundMethod: any = Object.values(requestMessagesResponses)[i];
+        let foundMethodString: string = Object.keys(requestMessagesResponses)[i];
+        const foundReq = foundMethod[0];
+        if (foundReq == method) {
+            methodFound = true;
+            if (foundMethod[1] != null && dataType === "request") {
+                try {
+                    let parsedData;
+                    if (!data || data.length === 0) {
+                        parsedData = {};
+                    } else {
+                        parsedData = foundMethod[1].decode(data).toJSON();
+                    }
+                    if (foundMethod[0] === 5012) {
+                        action_social = parsedData.action;
+                        Object.values(requestMessagesResponses).forEach(val => {
+                            let req: any = val;
+                            if (req[0] == action_social && req[1] != null && parsedData.payload && b64Decode(parsedData.payload)) {
+                                parsedData.payload = req[1].decode(b64Decode(parsedData.payload)).toJSON();
+                            }
+                        });
+                    }
+                    else if (foundMethod[0] === 600005) {
+                        action_gar_proxy = parsedData.action;
+                        switch (action_gar_proxy) {
+                            case 4:
+                                parsedData.payload = POGOProtos.Rpc.InternalGarAccountInfoProto.decode(b64Decode(parsedData.payload)).toJSON();
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                    returnObject = {
+                        methodId: foundMethod[0],
+                        methodName: remasterOrCleanMethodString(foundMethodString),
+                        data: parsedData,
+                    };
+                } catch (error) {
+                    console.error(`Error parsing request ${foundMethodString} -> ${error}`);
+                    returnObject = {
+                        methodId: foundMethod[0],
+                        methodName: remasterOrCleanMethodString(foundMethodString) + " [PARSE ERROR]",
+                        data: {
+                            error: "Failed to decode proto",
+                            errorMessage: error.toString()
+                        },
+                    };
+                }
+            } else if (dataType === "request") {
+                console.warn(`Request ${foundMethod[0]} Not Implemented`)
+                returnObject = {
+                    methodId: foundMethod[0],
+                    methodName: remasterOrCleanMethodString(foundMethodString) + " [NOT IMPLEMENTED]",
+                    data: {
+                        error: "Proto not implemented"
+                    },
+                };
+            }
+            if (foundMethod[2] != null && dataType === "response") {
+                try {
+                    let parsedData;
+                    if (!data || data.length === 0) {
+                        parsedData = {};
+                    } else {
+                        parsedData = foundMethod[2].decode(data).toJSON();
+                    }
+                    if (foundMethod[0] === 5012 && action_social > 0 && parsedData.payload) {
+                        parsedData.payload = DecoderInternalPayloadAsResponse(action_social, parsedData.payload);
+                    }
+                    else if (foundMethod[0] === 600005 && action_gar_proxy > 0 && parsedData.payload) {
+                        parsedData.payload = DecoderInternalGarPayloadAsResponse(action_gar_proxy, parsedData.payload);
+                    }
+                    returnObject = {
+                        methodId: foundMethod[0],
+                        methodName: remasterOrCleanMethodString(foundMethodString),
+                        data: parsedData,
+                    };
+                } catch (error) {
+                    console.error(`Error parsing response ${foundMethodString} method: [${foundReq}] -> ${error}`);
+                    returnObject = {
+                        methodId: foundMethod[0],
+                        methodName: remasterOrCleanMethodString(foundMethodString) + " [PARSE ERROR]",
+                        data: {
+                            error: "Failed to decode proto",
+                            errorMessage: error.toString()
+                        },
+                    };
+                }
+            } else if (dataType === "response") {
+                console.warn(`Response ${foundReq} Not Implemented`)
+                returnObject = {
+                    methodId: foundMethod[0],
+                    methodName: remasterOrCleanMethodString(foundMethodString) + " [NOT IMPLEMENTED]",
+                    data: {
+                        error: "Proto not implemented"
+                    },
+                };
+            }
+        }
+    }
+
+    if (!methodFound && returnObject === "Not Found") {
+        returnObject = {
+            methodId: method.toString(),
+            methodName: `Unknown Method ${method} [UNKNOWN]`,
+            data: {
+                error: "Unknown method ID"
             },
         };
     }

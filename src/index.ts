@@ -2,7 +2,8 @@ import http from "http";
 import fs from "fs";
 import crypto from "crypto";
 import { WebStreamBuffer, getIPAddress, handleData, moduleConfigIsAvailable, redirect_post_golbat } from "./utils";
-import { decodePayload, decodePayloadTraffic } from "./parser/proto-parser";
+import { decodePayload, decodePayloadTraffic, decodeProtoFromBytes } from "./parser/proto-parser";
+import { RawProtoCollection, RawProtoCollectionMessage } from "./protos/polygonx";
 import SampleSaver from "./utils/sample-saver";
 
 // try looking if config file exists...
@@ -206,6 +207,85 @@ const httpServer = http.createServer(function (req, res) {
                 }
             });
             break;
+        case "/polygonx":
+            req.on("data", function (chunk) {
+                incomingData.push(chunk);
+            });
+            req.on("end", function () {
+                try {
+                    const binaryData = Buffer.concat(incomingData);
+                    res.writeHead(200, { "Content-Type": "application/json" });
+                    res.end("");
+
+                    if (binaryData.length === 0) {
+                        console.error("Invalid PolygonX data: empty request body");
+                        return;
+                    }
+
+                    // Decode the RawProtoCollection from binary protobuf
+                    const decoded = RawProtoCollection.decode(binaryData) as unknown as RawProtoCollectionMessage;
+
+                    // Process RawProto entries (have both request and response)
+                    if (decoded.protos && Array.isArray(decoded.protos)) {
+                        for (const rawProto of decoded.protos) {
+                            const identifier = rawProto.trainerId || "unknown";
+                            const method = rawProto.method;
+                            const requestBytes = rawProto.request;
+                            const responseBytes = rawProto.proto;
+
+                            // Decode request
+                            if (requestBytes && requestBytes.length > 0) {
+                                const parsedRequestData = decodeProtoFromBytes(method, requestBytes, "request");
+                                if (typeof parsedRequestData !== "string") {
+                                    parsedRequestData.identifier = identifier;
+                                    outgoingProtoWebBufferInst.write(parsedRequestData);
+                                }
+                            }
+
+                            // Decode response
+                            if (responseBytes && responseBytes.length > 0) {
+                                const parsedResponseData = decodeProtoFromBytes(method, responseBytes, "response");
+                                if (typeof parsedResponseData !== "string") {
+                                    parsedResponseData.identifier = identifier;
+                                    incomingProtoWebBufferInst.write(parsedResponseData);
+                                }
+                            }
+
+                            // Save sample if enabled
+                            if (sampleSaver && requestBytes && responseBytes) {
+                                const requestB64 = Buffer.from(requestBytes).toString("base64");
+                                const responseB64 = Buffer.from(responseBytes).toString("base64");
+                                const parsedRequest = decodeProtoFromBytes(method, requestBytes, "request");
+                                const parsedResponse = decodeProtoFromBytes(method, responseBytes, "response");
+                                if (typeof parsedRequest !== "string" && typeof parsedResponse !== "string") {
+                                    sampleSaver.savePair(parsedRequest, parsedResponse, requestB64, responseB64, "polygonx");
+                                }
+                            }
+                        }
+                    }
+
+                    // Process RawPushGatewayProto entries (response only)
+                    if (decoded.pushGatewayProtos && Array.isArray(decoded.pushGatewayProtos)) {
+                        for (const pushProto of decoded.pushGatewayProtos) {
+                            const identifier = pushProto.trainerId || "unknown";
+                            const method = pushProto.method;
+                            const responseBytes = pushProto.proto;
+
+                            // Decode response
+                            if (responseBytes && responseBytes.length > 0) {
+                                const parsedResponseData = decodeProtoFromBytes(method, responseBytes, "response");
+                                if (typeof parsedResponseData !== "string") {
+                                    parsedResponseData.identifier = identifier;
+                                    incomingProtoWebBufferInst.write(parsedResponseData);
+                                }
+                            }
+                        }
+                    }
+                } catch (error) {
+                    console.error("Error processing PolygonX request:", error);
+                }
+            });
+            break;
         case "/traffic":
             req.on("data", function (chunk) {
                 incomingData.push(chunk);
@@ -387,7 +467,7 @@ Server start access of this in urls: http://localhost:${portBind} or WLAN mode h
 
     - Clients MITM:
         1) --=FurtiF™=- Tools EndPoints: http://${getIPAddress()}:${portBind}/traffic or http://${getIPAddress()}:${portBind}/golbat (depending on the modes chosen)
-        2) If Other set here...
+        2) PolygonX EndPoint: http://${getIPAddress()}:${portBind}/polygonx (application/x-protobuf)
         3) ...
 
 ProtoDecoderUI is not responsible for your errors.
