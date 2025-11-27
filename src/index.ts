@@ -207,7 +207,7 @@ const httpServer = http.createServer(function (req, res) {
                 }
             });
             break;
-        case "/polygonx":
+        case "/PolygonX/PostProtos":
             req.on("data", function (chunk) {
                 incomingData.push(chunk);
             });
@@ -467,7 +467,7 @@ Server start access of this in urls: http://localhost:${portBind} or WLAN mode h
 
     - Clients MITM:
         1) --=FurtiF™=- Tools EndPoints: http://${getIPAddress()}:${portBind}/traffic or http://${getIPAddress()}:${portBind}/golbat (depending on the modes chosen)
-        2) PolygonX EndPoint: http://${getIPAddress()}:${portBind}/polygonx (application/x-protobuf)
+        2) PolygonX EndPoint: http://${getIPAddress()}:${portBind}/PolygonX/PostProtos (application/x-protobuf)
         3) ...
 
 ProtoDecoderUI is not responsible for your errors.
