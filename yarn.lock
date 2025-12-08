@@ -15,9 +15,9 @@
     wrap-ansi-cjs "npm:wrap-ansi@^7.0.0"
 
 "@na-ji/pogo-protos@^2.131.0":
-  version "2.209.0"
-  resolved "https://registry.yarnpkg.com/@na-ji/pogo-protos/-/pogo-protos-2.209.0.tgz#ab44722a6e400a9ad7f3e6cbbf05738c042b6615"
-  integrity sha512-TVL0DAkK8khYPo9SOvKrj50mzFLmV/C8bPbUxEI8r8igU6f4Y7ehkGEnbaJ0P65lHI7W5g6oSTX9TXbhOe13fg==
+  version "2.212.0"
+  resolved "https://registry.yarnpkg.com/@na-ji/pogo-protos/-/pogo-protos-2.212.0.tgz#eba3476f885d93f01a4015e1f3000598b3261d29"
+  integrity sha512-enB10/SpUk2sJ2V3S6guTIZqVS8rjR1Nnjf8mjfzLsTndUda+Kp2ozj3cSLw8ZxIDiwGQBZBYnX4KIfrdc/iIg==
   dependencies:
     protobufjs "^6.11.4"
 
@@ -297,9 +297,9 @@ get-caller-file@^2.0.5:
   integrity sha512-DyFP3BM/3YHTQOCUL/w0OZHR0lpKeGrxotcHWcqNEdnltqFwXVfhEBQ94eIo34AfQpo0rGki4cyIiftY06h2Fg==
 
 glob@^10.3.7:
-  version "10.4.5"
-  resolved "https://registry.yarnpkg.com/glob/-/glob-10.4.5.tgz#f4d9f0b90ffdbab09c9d77f5f29b4262517b0956"
-  integrity sha512-7Bv8RF0k6xjo7d4A/PxYLbUCfb6c+Vpd2/mB2yRDlew7Jb5hEXiCD9ibfO7wpk8i4sevK6DFny9h7EYbM3/sHg==
+  version "10.5.0"
+  resolved "https://registry.yarnpkg.com/glob/-/glob-10.5.0.tgz#8ec0355919cd3338c28428a23d4f24ecc5fe738c"
+  integrity sha512-DfXN8DfhJ7NH3Oe7cFmu3NCu1wKbkReJ8TorzSAFbSKrlNaQSKfIzqYqVY8zlbs2NLBbWpRiU52GX2PbaBVNkg==
   dependencies:
     foreground-child "^3.1.0"
     jackspeak "^3.1.2"
