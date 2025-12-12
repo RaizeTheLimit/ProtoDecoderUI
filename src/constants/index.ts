@@ -420,6 +420,8 @@ export const requestMessagesResponses = {
 	REQUEST_TYPE_METHOD_COMPLETE_PVP_BATTLE: [3072, POGOProtos.Rpc.CompletePvpBattleProto, POGOProtos.Rpc.CompletePvpBattleOutProto],
 	REQUEST_TYPE_METHOD_AR_PHOTO_REWARD: [3074, null, null],
 	REQUEST_TYPE_METHOD_UPDATE_FIELD_BOOK_POST_CATCH_POKEMON: [3075, POGOProtos.Rpc.UpdateFieldBookPostCatchPokemonProto, POGOProtos.Rpc.UpdateFieldBookPostCatchPokemonOutProto],
+	REQUEST_TYPE_METHOD_GET_TIME_TRAVEL_INFORMATION: [3076, POGOProtos.Rpc.GetTimeTravelInformationProto, POGOProtos.Rpc.GetTimeTravelInformationOutProto],
+	REQUEST_TYPE_METHOD_DAY_NIGHT_POI_ENCOUNTER: [3077, POGOProtos.Rpc.DayNightPoiEncounterProto, POGOProtos.Rpc.DayNightPoiEncounterOutProto],
 	REQUEST_TYPE_PLATFORM_REGISTER_PUSH_NOTIFICATION: [5000, POGOProtos.Rpc.PushNotificationRegistryProto, POGOProtos.Rpc.PushNotificationRegistryOutProto],
 	REQUEST_TYPE_PLATFORM_UNREGISTER_PUSH_NOTIFICATION: [5001, null, null],
 	REQUEST_TYPE_PLATFORM_UPDATE_NOTIFICATION_STATUS: [5002, POGOProtos.Rpc.UpdateNotificationProto, POGOProtos.Rpc.UpdateNotificationOutProto],
