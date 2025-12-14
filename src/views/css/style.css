@@ -231,3 +231,239 @@ table tr td.important {
 		padding: 5px 10px !important;
 	}
 }
+
+/* =========================
+   Enhanced Method Filter Panel & Statistics
+   ========================= */
+#method-filter-wrapper,
+#statistics-wrapper {
+	padding: 0 5px;
+}
+
+.method-filter-panel,
+.statistics-panel {
+	border: 1px solid #ddd;
+	border-radius: 6px;
+	background: #fff;
+	margin-bottom: 10px;
+	box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+	height: 100%;
+}
+
+.dark .method-filter-panel,
+.dark .statistics-panel {
+	background: rgba(0, 0, 0, 0.2);
+	border-color: rgba(255, 255, 255, 0.2);
+}
+
+.filter-header,
+.stat-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 8px 12px;
+	background: #f7f7f7;
+	border-bottom: 1px solid #ddd;
+	border-radius: 6px 6px 0 0;
+	cursor: pointer;
+	user-select: none;
+}
+
+.dark .filter-header,
+.dark .stat-header {
+	background: rgba(0, 0, 0, 0.3);
+	border-bottom-color: rgba(255, 255, 255, 0.2);
+}
+
+.filter-toggle,
+.stat-toggle {
+	padding: 2px 8px;
+	font-size: 12px;
+	background: transparent;
+	border: 1px solid #ccc;
+	border-radius: 4px;
+	cursor: pointer;
+	color: var(--black-color);
+}
+
+.dark .filter-toggle,
+.dark .stat-toggle {
+	border-color: rgba(255, 255, 255, 0.3);
+}
+
+.filter-content,
+.stat-content {
+	padding: 10px;
+}
+
+.method-search {
+	width: 100%;
+	padding: 6px 10px;
+	margin-bottom: 8px;
+	border: 1px solid #ddd;
+	border-radius: 4px;
+	font-size: 13px;
+	box-sizing: border-box;
+}
+
+.dark .method-search {
+	background: rgba(0, 0, 0, 0.2);
+	border-color: rgba(255, 255, 255, 0.2);
+	color: var(--black-color);
+}
+
+.method-list {
+	max-height: 320px;
+	overflow-y: auto;
+	margin-top: 6px;
+}
+
+/* Proto Item (Method Filter Checkbox Row) */
+.proto-item {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	padding: 6px 8px;
+	margin-top: 4px;
+	border: 1px solid #ddd;
+	border-radius: 6px;
+	background: #fff;
+	cursor: pointer;
+	user-select: none;
+	transition: all 0.2s ease;
+}
+
+.dark .proto-item {
+	background: rgba(0, 0, 0, 0.2);
+	border-color: rgba(255, 255, 255, 0.2);
+}
+
+.proto-item:hover {
+	background: #f7f7f7;
+	border-color: #bbb;
+}
+
+.dark .proto-item:hover {
+	background: rgba(255, 255, 255, 0.05);
+	border-color: rgba(255, 255, 255, 0.3);
+}
+
+.proto-item.selected {
+	background: #eef;
+	border-color: #99c;
+}
+
+.dark .proto-item.selected {
+	background: rgba(100, 100, 255, 0.15);
+	border-color: rgba(100, 100, 255, 0.4);
+}
+
+.proto-item input[type="checkbox"] {
+	margin: 0 4px 0 2px;
+	cursor: pointer;
+}
+
+.proto-item .proto-id {
+	font-weight: 600;
+	min-width: 56px;
+	color: var(--important);
+}
+
+.proto-item .proto-name {
+	flex: 1;
+	opacity: 0.85;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.proto-item .proto-badge {
+	margin-left: auto;
+	min-width: 20px;
+	padding: 0 6px;
+	height: 18px;
+	line-height: 18px;
+	text-align: center;
+	border-radius: 9px;
+	border: 1px solid #e0e0e0;
+	font-size: 12px;
+	opacity: 0.75;
+	background: #f9f9f9;
+}
+
+.dark .proto-item .proto-badge {
+	background: rgba(255, 255, 255, 0.05);
+	border-color: rgba(255, 255, 255, 0.2);
+}
+
+.proto-item.selected .proto-badge {
+	opacity: 1;
+	font-weight: 600;
+}
+
+/* Row Highlighting - Disabled Methods */
+#data_socket tbody tr.proto-disabled {
+	color: #999;
+	opacity: 0.6;
+	background: transparent;
+}
+
+.dark #data_socket tbody tr.proto-disabled {
+	color: #666;
+}
+
+/* Statistics Panel */
+.stat-item {
+	display: flex;
+	justify-content: space-between;
+	padding: 4px 0;
+	font-size: 13px;
+}
+
+.stat-label {
+	font-weight: 500;
+	opacity: 0.8;
+}
+
+.stat-value {
+	font-weight: 600;
+	color: var(--important);
+}
+
+/* Mobile Optimization */
+@media (max-width: 768px) {
+	#method-filter-wrapper,
+	#statistics-wrapper {
+		padding: 0;
+		margin-bottom: 10px;
+	}
+
+	.method-list {
+		max-height: 200px;
+	}
+
+	.proto-item {
+		font-size: 11px;
+		padding: 4px 6px;
+	}
+
+	.proto-item .proto-id {
+		min-width: 40px;
+	}
+
+	.proto-item .proto-badge {
+		font-size: 10px;
+		padding: 0 4px;
+		height: 16px;
+		line-height: 16px;
+	}
+
+	.method-search {
+		font-size: 12px;
+		padding: 5px 8px;
+	}
+
+	.stat-item {
+		font-size: 11px;
+	}
+}
