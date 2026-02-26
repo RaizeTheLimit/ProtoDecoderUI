@@ -1,0 +1,23 @@
+{
+  "default_port": 8081,
+  "default_host": "0.0.0.0",
+  "trafficlight_identifier": "example",
+  "sample_saving": {
+    "enabled": true,
+    "path": "samples/",
+    "format": "json"
+  },
+  "log_level": "DEBUG",
+  "log_file": "logs/app.log",
+  "gui_settings": {
+    "window_width": 1024,
+    "window_height": 768,
+    "resizable": true,
+    "center_on_screen": true
+  },
+  "theme_settings": {
+    "current_theme": "dark",
+    "auto_switch": true,
+    "transition_duration": 200
+  }
+}

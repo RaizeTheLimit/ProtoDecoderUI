@@ -2,7 +2,10 @@ node_modules
 .env
 dist
 *.log
+logs/
 /src/config/config.json
 /.vs/
 /.idea/
 /proto_samples/
+/python/scripts/temp_tools/
+__pycache__/

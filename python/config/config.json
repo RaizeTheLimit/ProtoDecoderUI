@@ -1,0 +1,27 @@
+{
+  "default_port": 8081,
+  "default_host": "0.0.0.0",
+  "trafficlight_identifier": "default",
+  "sample_saving": null,
+  "log_level": "INFO",
+  "log_file": "logs/app.log",
+  "gui_settings": {
+    "window_width": 800,
+    "window_height": 600,
+    "resizable": true,
+    "center_on_screen": true
+  },
+  "theme_settings": {
+    "current_theme": "light",
+    "auto_switch": false,
+    "transition_duration": 300
+  },
+  "filters": {
+    "enabled": true,
+    "mode": "blacklist",
+    "instances": [],
+    "methods": [],
+    "selected_instance": "",
+    "method_ids": ""
+  }
+}
