@@ -67,7 +67,6 @@ class MainWindow:
                 # Try alternative paths
                 alt_paths = [
                     Path("assets/favicon.png"),
-                    Path("images/favicon.png"),
                     Path("favicon.png")
                 ]
                 for alt_path in alt_paths:
@@ -853,12 +852,7 @@ class MainWindow:
         """Update server status and theme"""
         self.server_running = is_running
         
-        if is_running:
-            self.server_status_btn.config(text="🟢")
-        else:
-            self.server_status_btn.config(text="🔴")
-        
-        # Update theme to reflect server status
+        # Server status button was removed, so just update theme
         self._apply_theme_to_all()
     
     def show_about(self):

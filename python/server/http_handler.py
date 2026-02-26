@@ -109,11 +109,11 @@ class RequestHandler(BaseHTTPRequestHandler):
             
             try:
                 data_str = post_data.decode('utf-8')
-                print(f"Raw data received: {data_str}")
-                self.logger.info(f"Raw data received: {data_str}")
+                #print(f"Raw data received: {data_str}")
+                self.logger.debug(f"Raw data received: {data_str}")
             except:
                 print(f"Raw data (hex): {post_data.hex()}")
-                self.logger.info(f"Raw data (hex): {post_data.hex()}")
+                self.logger.error(f"Raw data (hex): {post_data.hex()}")
             
             path = self.path
             
