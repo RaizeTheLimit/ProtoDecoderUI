@@ -956,9 +956,34 @@ class MainWindow:
         self.current_theme = self.light_theme
     
     def toggle_dark_mode(self):
-        """Toggle dark mode - Enhanced with immediate header update"""
+        """Toggle dark mode - Enhanced with auto_switch and transition_duration"""
+        # Load theme settings from config
+        try:
+            config = self.config_manager.load_config() if hasattr(self, 'config_manager') else {}
+            theme_settings = config.get('theme_settings', {})
+            auto_switch = theme_settings.get('auto_switch', False)
+            transition_duration = theme_settings.get('transition_duration', 300)
+        except:
+            auto_switch = False
+            transition_duration = 300
+        
         self.dark_mode = not self.dark_mode
         
+        # Apply transition if duration > 0
+        if transition_duration > 0:
+            self.root.after(transition_duration // 2, self._apply_theme_transition)
+        else:
+            self._apply_theme_transition()
+        
+        # Auto-switch logic
+        if auto_switch:
+            # Could implement time-based auto-switching here
+            # For now, just log that auto-switch is enabled
+            if hasattr(self, 'logger'):
+                self.logger.info("Auto-switch enabled - theme toggled")
+    
+    def _apply_theme_transition(self):
+        """Apply the actual theme transition"""
         if self.dark_mode:
             self.current_theme = self.dark_theme
             self.darkmode_btn.config(text="☾")

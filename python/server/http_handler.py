@@ -405,7 +405,8 @@ class HTTPServerHandler:
     def get_identifier(self) -> str:
         """Get unique identifier - EXACT replica of JavaScript identifier"""
         self.identifier_counter += 1
-        return f"client_{self.identifier_counter}"
+        trafficlight_id = self.config.get('trafficlight_identifier', 'default')
+        return f"{trafficlight_id}_{self.identifier_counter}"
     
     def generate_session_token(self) -> str:
         """Generate session token - EXACT replica of JavaScript generateSessionToken"""
