@@ -45,7 +45,36 @@ class MainWindow:
     def setup_window(self):
         """Setup main window - exact replica of JavaScript window"""
         self.root.title("ProtoDecoderUI")
-        self.root.geometry("1200x800")
+        
+        # Load GUI settings from config
+        try:
+            config = self.config_manager.load_config() if hasattr(self, 'config_manager') else {}
+            gui_settings = config.get('gui_settings', {})
+            
+            width = gui_settings.get('window_width', 1200)
+            height = gui_settings.get('window_height', 800)
+            resizable = gui_settings.get('resizable', True)
+            center_on_screen = gui_settings.get('center_on_screen', True)
+            
+            self.root.geometry(f"{width}x{height}")
+            
+            if resizable:
+                self.root.resizable(True, True)
+            else:
+                self.root.resizable(False, False)
+            
+            if center_on_screen:
+                # Center window on screen
+                self.root.update_idletasks()
+                x = (self.root.winfo_screenwidth() // 2) - (width // 2)
+                y = (self.root.winfo_screenheight() // 2) - (height // 2)
+                self.root.geometry(f"{width}x{height}+{x}+{y}")
+                
+        except Exception as e:
+            # Fallback to default settings
+            self.root.geometry("1200x800")
+            self.logger.error(f"Error loading GUI settings: {e}")
+        
         self.root.configure(bg=self.current_theme['bg'])
         
         # Set window icon from favicon.png
@@ -845,7 +874,7 @@ class MainWindow:
             json_window.geometry(f"1000x700+{x}+{y}")
             
         except Exception as e:
-            print(f"Error showing JSON details: {e}")
+            self.logger.error(f"Error showing JSON details: {e}")
             messagebox.showerror("Error", f"Failed to show JSON details: {e}")
     
     def update_server_status(self, is_running: bool):

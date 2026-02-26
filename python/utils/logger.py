@@ -7,10 +7,10 @@ import logging
 import os
 from pathlib import Path
 
-def setup_logging(log_level="INFO"):
+def setup_logging(log_level="INFO", log_file="logs/app.log"):
     """Setup logging - exact replica of JavaScript logging setup"""
     # Create logs directory
-    logs_dir = Path("logs")
+    logs_dir = Path(log_file).parent
     logs_dir.mkdir(exist_ok=True)
     
     # Convert string log level to logging constant
@@ -29,7 +29,7 @@ def setup_logging(log_level="INFO"):
         format='[%(asctime)s] [%(levelname)s] %(message)s',
         datefmt='%H:%M:%S',
         handlers=[
-            logging.FileHandler(logs_dir / "app.log"),
+            logging.FileHandler(log_file),
             logging.StreamHandler()
         ]
     )

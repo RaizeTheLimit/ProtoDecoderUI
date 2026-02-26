@@ -44,10 +44,6 @@ class RequestHandler(BaseHTTPRequestHandler):
         """Handle POST requests - EXACT replica of JavaScript POST handling"""
         try:
             # Log ALL incoming requests - EXACT replica of JavaScript logging
-            print(f"=== POST REQUEST START ===")
-            print(f"POST request to {self.path} from {self.client_address[0]}")
-            print(f"ALL Headers: {dict(self.headers)}")
-            
             self.logger.info(f"=== POST REQUEST START ===")
             self.logger.info(f"POST request to {self.path} from {self.client_address[0]}")
             self.logger.info(f"ALL Headers: {dict(self.headers)}")
@@ -61,8 +57,6 @@ class RequestHandler(BaseHTTPRequestHandler):
             content_length = int(self.headers.get('Content-Length', 0))
             transfer_encoding = self.headers.get('Transfer-Encoding', '').lower()
             
-            print(f"Content-Length from header: {content_length}")
-            print(f"Transfer-Encoding from header: {transfer_encoding}")
             self.logger.info(f"Content-Length from header: {content_length}")
             self.logger.info(f"Transfer-Encoding from header: {transfer_encoding}")
             
@@ -97,12 +91,10 @@ class RequestHandler(BaseHTTPRequestHandler):
                 else:
                     post_data = b''
             
-            print(f"Actually read {len(post_data)} bytes from rfile")
             self.logger.info(f"Actually read {len(post_data)} bytes from rfile")
             
             # Log the actual received data
             if len(post_data) == 0:
-                print(f"Empty POST request to {self.path}")
                 self.logger.warning(f"Empty POST request to {self.path}")
                 self._send_response(400, "Bad Request")
                 return
@@ -112,37 +104,29 @@ class RequestHandler(BaseHTTPRequestHandler):
                 #print(f"Raw data received: {data_str}")
                 self.logger.debug(f"Raw data received: {data_str}")
             except:
-                print(f"Raw data (hex): {post_data.hex()}")
                 self.logger.error(f"Raw data (hex): {post_data.hex()}")
             
             path = self.path
             
             # Route to appropriate handler - EXACT replica of JavaScript routing
             if path == '/traffic':
-                print("Routing to /traffic handler")
                 self.logger.info("Routing to /traffic handler")
                 self._handle_traffic(post_data)
             elif path == '/golbat':
-                print("Routing to /golbat handler")
                 self.logger.info("Routing to /golbat handler")
                 self._handle_golbat(post_data)
             elif path == '/PolygonX/PostProtos':
-                print("Routing to /PolygonX/PostProtos handler")
                 self.logger.info("Routing to /PolygonX/PostProtos handler")
                 self._handle_polygonx(post_data)
             else:
-                print(f"No handler for path: {path}")
                 self.logger.warning(f"No handler for path: {path}")
                 self._send_response(404, "Not Found")
             
-            print(f"=== POST REQUEST END ===")
             self.logger.info(f"=== POST REQUEST END ===")
                 
         except Exception as e:
-            print(f"Error in POST handler: {e}")
             self.logger.error(f"Error in POST handler: {e}")
             import traceback
-            print(f"Traceback: {traceback.format_exc()}")
             self.logger.error(f"Traceback: {traceback.format_exc()}")
             self._send_response(500, str(e))
     
@@ -240,7 +224,6 @@ class RequestHandler(BaseHTTPRequestHandler):
                     raw_response = content_item.get('payload', "")  # Note: golbat uses 'payload' not 'response'
                     method_id = content_item.get('type', 0)  # Note: golbat uses 'type' not 'method'
                     
-                    print(f"Processing golbat item {i}: method={method_id}, request_len={len(raw_request)}, response_len={len(raw_response)}")
                     self.logger.info(f"Processing golbat item {i}: method={method_id}, request_len={len(raw_request)}, response_len={len(raw_response)}")
                     
                     # Parse request and response - EXACT replica of JavaScript parsing
@@ -255,8 +238,6 @@ class RequestHandler(BaseHTTPRequestHandler):
                         "response"
                     )
                     
-                    print(f"Request decode result: {type(parsed_request_data)} - {len(parsed_request_data) if isinstance(parsed_request_data, list) else 'string'}")
-                    print(f"Response decode result: {type(parsed_response_data)} - {len(parsed_response_data) if isinstance(parsed_response_data, list) else 'string'}")
                     self.logger.info(f"Request decode result: {type(parsed_request_data)} - {len(parsed_request_data) if isinstance(parsed_request_data, list) else 'string'}")
                     self.logger.info(f"Response decode result: {type(parsed_response_data)} - {len(parsed_response_data) if isinstance(parsed_response_data, list) else 'string'}")
                     
@@ -281,8 +262,8 @@ class RequestHandler(BaseHTTPRequestHandler):
                     else:
                         for parsed_object in parsed_request_data:
                             parsed_object['identifier'] = identifier
-                            print(f"Writing to incoming buffer: {parsed_object.get('methodName', 'Unknown')} - {type(parsed_object)}")
-                            print(f"Sample data: {str(parsed_object)[:200]}...")
+                            self.logger.info(f"Writing to incoming buffer: {parsed_object.get('methodName', 'Unknown')} - {type(parsed_object)}")
+                            self.logger.debug(f"Sample data: {str(parsed_object)[:200]}...")
                             self.server_instance.incoming_buffer.write(parsed_object)
                             self.logger.info(f"Wrote golbat request data to buffer: {parsed_object.get('methodName', 'Unknown')}")
                     
@@ -293,8 +274,8 @@ class RequestHandler(BaseHTTPRequestHandler):
                     else:
                         for parsed_object in parsed_response_data:
                             parsed_object['identifier'] = identifier
-                            print(f"Writing to outgoing buffer: {parsed_object.get('methodName', 'Unknown')} - {type(parsed_object)}")
-                            print(f"Sample data: {str(parsed_object)[:200]}...")
+                            self.logger.info(f"Writing to outgoing buffer: {parsed_object.get('methodName', 'Unknown')} - {type(parsed_object)}")
+                            self.logger.debug(f"Sample data: {str(parsed_object)[:200]}...")
                             self.server_instance.outgoing_buffer.write(parsed_object)
                             self.logger.info(f"Wrote golbat response data to buffer: {parsed_object.get('methodName', 'Unknown')}")
                 
@@ -514,17 +495,17 @@ class HTTPServerHandler:
     def get_incoming_data(self) -> list:
         """Get incoming data - EXACT replica of JavaScript data access"""
         data = self.incoming_buffer.read()
-        print(f"get_incoming_data called: returning {len(data)} items")
+        self.logger.debug(f"get_incoming_data called: returning {len(data)} items")
         if len(data) > 0:
-            print(f"Sample incoming data: {data[0].get('methodName', 'Unknown')}")
+            self.logger.debug(f"Sample incoming data: {data[0].get('methodName', 'Unknown')}")
         return data
     
     def get_outgoing_data(self) -> list:
         """Get outgoing data - EXACT replica of JavaScript data access"""
         data = self.outgoing_buffer.read()
-        print(f"get_outgoing_data called: returning {len(data)} items")
+        self.logger.debug(f"get_outgoing_data called: returning {len(data)} items")
         if len(data) > 0:
-            print(f"Sample outgoing data: {data[0].get('methodName', 'Unknown')}")
+            self.logger.debug(f"Sample outgoing data: {data[0].get('methodName', 'Unknown')}")
         return data
     
     def on_incoming_data(self, callback):

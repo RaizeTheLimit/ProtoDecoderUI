@@ -38,8 +38,9 @@ class ProtoDecoderApp:
             config = self.config_manager.load_config()
             
             # Setup logging with config level
-            log_level = config.get("logging", {}).get("level", "INFO")
-            self.logger = setup_logging(log_level)
+            log_level = config.get("log_level", "INFO")
+            log_file = config.get("log_file", "logs/app.log")
+            self.logger = setup_logging(log_level, log_file)
             self.logger.info("Starting ProtoDecoder Python Desktop Application (GUI Mode)")
             self.logger.info(f"Log level set to: {log_level}")
             
