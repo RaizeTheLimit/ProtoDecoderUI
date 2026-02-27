@@ -9,6 +9,8 @@ import json
 import logging
 import socket
 import requests
+import threading
+import atexit
 from pathlib import Path
 from typing import Dict, Any, List, Optional
 
@@ -48,38 +50,87 @@ def getIPAddress() -> str:
         return '0.0.0.0'
 
 class WebStreamBuffer:
-    """EXACT replica of JavaScript WebStreamBuffer"""
+    """EXACT replica of JavaScript WebStreamBuffer with thread safety"""
     
     def __init__(self):
         self.data = []
         self.callbacks = []
+        self.lock = threading.Lock()
+        self._shutdown = False
+        
+        # Register cleanup
+        atexit.register(self._cleanup)
+    
+    def _cleanup(self):
+        """Cleanup to prevent issues during shutdown"""
+        with self.lock:
+            self._shutdown = True
+            self.data.clear()
+            self.callbacks.clear()
     
     def write(self, data: Any) -> None:
-        """Write data to buffer"""
-        print(f"WebStreamBuffer.write called: {data.get('methodName', 'Unknown')}")
-        self.data.append(data)
-        print(f"Buffer size after write: {len(self.data)}")
-        self._notify_callbacks(data)
+        """Write data to buffer - thread safe"""
+        if self._shutdown:
+            return
+            
+        with self.lock:
+            try:
+                # Only print if not during shutdown
+                if not self._shutdown:
+                    method_name = data.get('methodName', 'Unknown')
+                    print(f"WebStreamBuffer.write called: {method_name}")
+                    print(f"Buffer size after write: {len(self.data)}")
+                
+                self.data.append(data)
+                self._notify_callbacks_safe(data)
+            except Exception:
+                # Ignore errors during shutdown
+                pass
     
     def read(self) -> List[Any]:
-        """Read all data from buffer"""
-        print(f"WebStreamBuffer.read called: {len(self.data)} items available")
-        data = self.data.copy()
-        self.data.clear()
-        print(f"WebStreamBuffer.read returning: {len(data)} items")
-        return data
+        """Read all data from buffer - thread safe"""
+        if self._shutdown:
+            return []
+            
+        with self.lock:
+            try:
+                if not self._shutdown:
+                    print(f"WebStreamBuffer.read called: {len(self.data)} items available")
+                
+                data = self.data.copy()
+                self.data.clear()
+                
+                if not self._shutdown:
+                    print(f"WebStreamBuffer.read returning: {len(data)} items")
+                
+                return data
+            except Exception:
+                # Ignore errors during shutdown
+                return []
     
     def on_data(self, callback) -> None:
         """Register callback for new data"""
-        self.callbacks.append(callback)
+        with self.lock:
+            if not self._shutdown:
+                self.callbacks.append(callback)
     
-    def _notify_callbacks(self, data: Any) -> None:
-        """Notify all callbacks of new data"""
-        for callback in self.callbacks:
+    def _notify_callbacks_safe(self, data: Any) -> None:
+        """Notify all callbacks of new data - thread safe"""
+        if self._shutdown:
+            return
+            
+        # Make a copy of callbacks to avoid modification during iteration
+        callbacks_copy = self.callbacks.copy()
+        
+        for callback in callbacks_copy:
             try:
                 callback(data)
             except Exception as e:
-                logging.error(f"Error in callback: {e}")
+                try:
+                    logging.error(f"Error in callback: {e}")
+                except:
+                    # Ignore logging errors during shutdown
+                    pass
 
 def handleData(incoming: WebStreamBuffer, outgoing: WebStreamBuffer, identifier: Any, parsedData: str, sampleSaver: Optional[Any] = None) -> None:
     """EXACT replica of JavaScript handleData"""
