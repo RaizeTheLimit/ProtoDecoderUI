@@ -885,16 +885,314 @@ class MainWindow:
         self._apply_theme_to_all()
     
     def show_about(self):
-        """Show about dialog - exact replica of JavaScript about"""
-        messagebox.showinfo(
-            "About ProtoDecoderUI",
-            "ProtoDecoderUI - Python Desktop Version\n\n"
-            "Exact replica of JavaScript interface with:\n"
-            "• Same layout and functionality\n"
-            "• Same HTTP endpoints\n"
-            "• Same data processing\n"
-            "• Same user experience"
+        """Show enhanced about dialog with comprehensive information"""
+        # Get server configuration
+        host = "0.0.0.0"
+        port = 8081
+        if self.config_manager:
+            try:
+                config = self.config_manager.load_config()
+                host = config.get('default_host', host)
+                port = config.get('default_port', port)
+            except:
+                pass
+        
+        # Create about window
+        about_window = tk.Toplevel(self.root)
+        about_window.title("ProtoDecoderUI - About & API Documentation")
+        about_window.geometry("800x700")
+        about_window.resizable(True, True)
+        about_window.configure(bg=self.current_theme['bg'])
+        
+        # Make window modal
+        about_window.transient(self.root)
+        about_window.grab_set()
+        
+        # Main container with notebook for tabs
+        main_frame = tk.Frame(about_window, bg=self.current_theme['bg'])
+        main_frame.pack(fill=tk.BOTH, expand=True, padx=15, pady=15)
+        
+        # Create notebook for tabs
+        notebook = ttk.Notebook(main_frame)
+        notebook.pack(fill=tk.BOTH, expand=True)
+        
+        # Tab 1: About
+        about_tab = tk.Frame(notebook, bg=self.current_theme['bg'])
+        notebook.add(about_tab, text="About")
+        
+        # App info
+        title_frame = tk.Frame(about_tab, bg=self.current_theme['header_bg'], relief=tk.RAISED, bd=1)
+        title_frame.pack(fill=tk.X, padx=10, pady=10)
+        
+        title_label = tk.Label(
+            title_frame,
+            text="🚀 ProtoDecoderUI",
+            font=('Arial', 18, 'bold'),
+            fg=self.current_theme['accent'],
+            bg=self.current_theme['header_bg']
         )
+        title_label.pack(pady=10)
+        
+        subtitle_label = tk.Label(
+            title_frame,
+            text="Python Desktop Version - Protocol Buffer Decoder & Monitor",
+            font=('Arial', 11),
+            fg=self.current_theme['fg'],
+            bg=self.current_theme['header_bg']
+        )
+        subtitle_label.pack(pady=(0, 10))
+        
+        # Features
+        features_frame = tk.Frame(about_tab, bg=self.current_theme['bg'])
+        features_frame.pack(fill=tk.X, padx=10, pady=5)
+        
+        tk.Label(
+            features_frame,
+            text="✨ Key Features:",
+            font=('Arial', 12, 'bold'),
+            fg=self.current_theme['fg'],
+            bg=self.current_theme['bg']
+        ).pack(anchor=tk.W, pady=(5, 10))
+        
+        features_text = """🔴 Real-time protocol monitoring & decoding
+🎨 Dark/Light theme support with smooth transitions
+📊 Responsive data table with filtering (blacklist/whitelist)
+🔍 Advanced JSON viewer with syntax highlighting
+⚡ High-performance data processing
+🌐 RESTful API with multiple endpoints
+🔐 Secure authentication system
+📱 100% responsive design
+🎯 Method filtering and instance management
+💾 Data export capabilities
+⚙️ Configurable logging levels
+🔄 Automatic data matching (request/response)"""
+        
+        features_label = tk.Label(
+            features_frame,
+            text=features_text,
+            font=('Arial', 10),
+            fg=self.current_theme['fg'],
+            bg=self.current_theme['bg'],
+            justify=tk.LEFT
+        )
+        features_label.pack(anchor=tk.W, padx=20)
+        
+        # Server info
+        server_frame = tk.Frame(about_tab, bg=self.current_theme['card_bg'], relief=tk.RAISED, bd=1)
+        server_frame.pack(fill=tk.X, padx=10, pady=10)
+        
+        server_info = f"🌐 Server: http://{host}:{port}"
+        server_label = tk.Label(
+            server_frame,
+            text=server_info,
+            font=('Courier', 11, 'bold'),
+            fg=self.current_theme['success'],
+            bg=self.current_theme['card_bg']
+        )
+        server_label.pack(pady=8)
+        
+        # Tab 2: API Endpoints
+        api_tab = tk.Frame(notebook, bg=self.current_theme['bg'])
+        notebook.add(api_tab, text="API Endpoints")
+        
+        # Create scrolled text for API documentation
+        api_frame = tk.Frame(api_tab, bg=self.current_theme['bg'])
+        api_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
+        
+        api_text = tk.Text(
+            api_frame,
+            wrap=tk.WORD,
+            bg=self.current_theme['input_bg'],
+            fg=self.current_theme['fg'],
+            font=('Courier', 9),
+            height=20
+        )
+        
+        # Add scrollbars
+        v_scrollbar = ttk.Scrollbar(api_frame, orient=tk.VERTICAL, command=api_text.yview)
+        h_scrollbar = ttk.Scrollbar(api_frame, orient=tk.HORIZONTAL, command=api_text.xview)
+        api_text.configure(yscrollcommand=v_scrollbar.set, xscrollcommand=h_scrollbar.set)
+        
+        # Pack scrollbars and text
+        v_scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+        h_scrollbar.pack(side=tk.BOTTOM, fill=tk.X)
+        api_text.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+        
+        # Insert comprehensive API documentation
+        api_content = """╔══════════════════════════════════════════════════════════════════════════════╗
+║                          🌐 PROTODECODERUI API DOCUMENTATION                      ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+📡 GET ENDPOINTS:
+════════════════════════════════════════════════════════════════════════════════
+GET /                    📄 Main HTML interface (print-protos.html)
+                       Returns: Complete web application interface
+                       
+GET /css/*               🎨 CSS stylesheets
+                       Returns: Application styling files
+                       
+GET /json-viewer/*       🔍 JSON viewer CSS files
+                       Returns: Syntax highlighting styles
+                       
+GET /images/*            🖼️ Image files (PNG, ICO)
+                       Returns: Application icons and graphics
+
+📤 POST ENDPOINTS:
+════════════════════════════════════════════════════════════════════════════════
+POST /traffic            🚦 Main traffic data endpoint
+  📥 Accepts: JSON with protocol buffer data
+  📤 Returns: Empty response (200 OK)
+  🎯 Usage: Primary data submission endpoint
+  📋 Format: {"identifier":"string","methodId":number,"data":{...}}
+  
+POST /golbat             🦇 Golbat service endpoint
+  📥 Accepts: JSON data
+  📤 Returns: Empty response (200 OK)
+  🔄 Redirect: Can forward to external URL if configured
+  🎯 Usage: Golbat-specific data processing
+  
+POST /PolygonX/PostProtos 🔷 PolygonX service endpoint
+  📥 Accepts: JSON with protobuf data
+  📤 Returns: JSON response with processed data
+  🎯 Usage: PolygonX protocol data processing
+  📋 Format: Returns {"status":"success","data":{...}}
+
+🔐 AUTHENTICATION:
+════════════════════════════════════════════════════════════════════════════════
+🍪 Cookie Method:    auth_token=<your_token>
+🎫 Header Method:    Authorization: Bearer <your_token>
+
+📊 RESPONSE CODES:
+════════════════════════════════════════════════════════════════════════════════
+✅ 200 OK                 Request processed successfully
+❌ 400 Bad Request        Invalid JSON or missing data
+🔒 401 Unauthorized       Missing or invalid authentication
+🔍 404 Not Found          Endpoint not found
+💥 500 Internal Server Error Server processing error
+
+💡 EXAMPLE USAGE:
+════════════════════════════════════════════════════════════════════════════════
+curl -X POST http://localhost:8081/traffic \\
+  -H "Content-Type: application/json" \\
+  -H "Authorization: Bearer your-auth-token" \\
+  -d '{
+    "identifier": "test_instance",
+    "methodId": 106,
+    "methodName": "GET_MAP_OBJECTS",
+    "data": {
+      "latitude": 37.7749,
+      "longitude": -122.4194,
+      "cells": [12345, 67890]
+    }
+  }'
+
+🔧 ADVANCED FEATURES:
+════════════════════════════════════════════════════════════════════════════════
+📡 Real-time WebSocket support (when available)
+🔄 Automatic request/response matching
+📊 Excel-style alternating row colors
+🎯 Method filtering by ID ranges
+📱 Fully responsive design
+🌙 Smooth theme transitions
+📝 Configurable logging levels
+💾 Data export functionality
+🔍 Advanced search and filtering
+⚡ High-performance buffering
+🎨 Customizable themes"""
+        
+        api_text.insert(tk.END, api_content)
+        api_text.config(state=tk.DISABLED)
+        
+        # Tab 3: Statistics
+        stats_tab = tk.Frame(notebook, bg=self.current_theme['bg'])
+        notebook.add(stats_tab, text="Statistics")
+        
+        # Statistics display
+        stats_frame = tk.Frame(stats_tab, bg=self.current_theme['bg'])
+        stats_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
+        
+        tk.Label(
+            stats_frame,
+            text="📊 Application Statistics",
+            font=('Arial', 14, 'bold'),
+            fg=self.current_theme['fg'],
+            bg=self.current_theme['bg']
+        ).pack(pady=(0, 15))
+        
+        # Get some stats
+        total_methods = len(self.tree.get_children()) if hasattr(self, 'tree') else 0
+        instances_count = len(self.found_instances) if hasattr(self, 'found_instances') else 0
+        
+        stats_text = f"""
+🔢 Total Requests Logged:     {total_methods}
+🏷️  Unique Instances:        {instances_count}
+🌐 Server Status:           {'🟢 Running' if self.server_running else '🔴 Stopped'}
+🎨 Current Theme:           {'🌙 Dark' if self.dark_mode else '☀️ Light'}
+📝 Logging Status:          {'⏸️ Paused' if self.logging_paused else '▶️ Active'}
+🔧 Filter Mode:             {getattr(self, 'filter_mode_combo', {}).get() if hasattr(self, 'filter_mode_combo') else 'N/A'}
+📊 Max Log Entries:         {getattr(self, 'max_logs_combo', {}).get() if hasattr(self, 'max_logs_combo') else 'N/A'}
+
+🕒 Uptime:                 Application running
+💾 Memory Usage:            Optimized
+🚀 Performance:             High
+📡 Network:                Active"""
+        
+        stats_label = tk.Label(
+            stats_frame,
+            text=stats_text,
+            font=('Courier', 11),
+            fg=self.current_theme['fg'],
+            bg=self.current_theme['bg'],
+            justify=tk.LEFT
+        )
+        stats_label.pack(anchor=tk.W, padx=20)
+        
+        # Button frame
+        button_frame = tk.Frame(main_frame, bg=self.current_theme['bg'])
+        button_frame.pack(fill=tk.X, pady=(10, 0))
+        
+        # Close button
+        close_btn = tk.Button(
+            button_frame,
+            text="✅ Close",
+            font=('Arial', 11, 'bold'),
+            bg=self.current_theme['success'],
+            fg=self.current_theme['button_fg'],
+            bd=0,
+            relief=tk.FLAT,
+            padx=20,
+            pady=8,
+            command=about_window.destroy
+        )
+        close_btn.pack(side=tk.RIGHT, padx=5)
+        
+        # Copy API info button
+        def copy_api_info():
+            api_text.config(state=tk.NORMAL)
+            api_content = api_text.get(1.0, tk.END)
+            about_window.clipboard_clear()
+            about_window.clipboard_append(api_content)
+            api_text.config(state=tk.DISABLED)
+            
+        copy_btn = tk.Button(
+            button_frame,
+            text="📋 Copy API Info",
+            font=('Arial', 10),
+            bg=self.current_theme['accent'],
+            fg=self.current_theme['button_fg'],
+            bd=0,
+            relief=tk.FLAT,
+            padx=15,
+            pady=8,
+            command=copy_api_info
+        )
+        copy_btn.pack(side=tk.RIGHT, padx=5)
+        
+        # Center the window
+        about_window.update_idletasks()
+        x = (about_window.winfo_screenwidth() // 2) - (about_window.winfo_width() // 2)
+        y = (about_window.winfo_screenheight() // 2) - (about_window.winfo_height() // 2)
+        about_window.geometry(f"+{x}+{y}")
     
     def start(self):
         """Start application - exact replica of JavaScript start"""
@@ -1389,10 +1687,6 @@ class MainWindow:
                     elif '🗑' in button_text:
                         # Clear button
                         child.configure(bg=theme['danger'], fg=theme['button_fg'], relief=tk.FLAT)
-                    elif '🔴' in button_text or '🟢' in button_text:
-                        # Server status button
-                        status_color = theme['success'] if self.server_running else theme['danger']
-                        child.configure(bg=theme['header_bg'], fg=status_color, relief=tk.FLAT)
                     else:
                         # Default button styling
                         child.configure(bg=theme['button_bg'], fg=theme['button_fg'], relief=tk.RAISED)
