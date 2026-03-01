@@ -18,4 +18,3 @@ Credits:
 """
 
 from .pogo_pb2 import *
-from .polygonx_pb2 import *
