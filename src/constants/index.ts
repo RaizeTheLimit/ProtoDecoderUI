@@ -189,7 +189,7 @@ export const requestMessagesResponses = {
 	REQUEST_TYPE_METHOD_INVASION_ENCOUNTER: [1204, POGOProtos.Rpc.InvasionEncounterProto, POGOProtos.Rpc.InvasionEncounterOutProto],
 	REQUEST_TYPE_METHOD_PURIFY_POKEMON: [1205, POGOProtos.Rpc.PurifyPokemonProto, POGOProtos.Rpc.PurifyPokemonOutProto],
 	REQUEST_TYPE_METHOD_GET_ROCKET_BALLOON: [1206, POGOProtos.Rpc.GetRocketBalloonProto, POGOProtos.Rpc.GetRocketBalloonOutProto],
-	REQUEST_TYPE_METHOD_START_ROCKET_BALLOON_INCIDENT: [1207, POGOProtos.Rpc.StartRocketBalloonIncidentProto, null],
+	REQUEST_TYPE_METHOD_START_ROCKET_BALLOON_INCIDENT: [1207, POGOProtos.Rpc.StartRocketBalloonIncidentProto, POGOProtos.Rpc.StartIncidentOutProto],
 	REQUEST_TYPE_METHOD_VS_SEEKER_START_MATCHMAKING: [1300, POGOProtos.Rpc.VsSeekerStartMatchmakingProto, POGOProtos.Rpc.VsSeekerStartMatchmakingOutProto],
 	REQUEST_TYPE_METHOD_CANCEL_MATCHMAKING: [1301, POGOProtos.Rpc.CancelMatchmakingProto, POGOProtos.Rpc.CancelMatchmakingOutProto],
 	REQUEST_TYPE_METHOD_GET_MATCHMAKING_STATUS: [1302, POGOProtos.Rpc.GetMatchmakingStatusProto, POGOProtos.Rpc.GetMatchmakingStatusOutProto],
