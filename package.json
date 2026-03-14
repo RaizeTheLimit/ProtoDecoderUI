@@ -29,6 +29,7 @@
   "dependencies": {
     "@na-ji/pogo-protos": "^2.131.0",
     "jquery.json-viewer": "^1.5.0",
+    "js-yaml": "^4.1.0",
     "socket.io": "^4.6.2"
   }
 }
