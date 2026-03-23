@@ -3,8 +3,8 @@ import fs from "fs";
 import crypto from "crypto";
 import { WebStreamBuffer, getIPAddress, handleData, moduleConfigIsAvailable, redirect_post_golbat } from "./utils";
 import { decodePayload, decodePayloadTraffic, decodeProtoFromBytes } from "./parser/proto-parser";
-import { RawProtoCollection, RawProtoCollectionMessage } from "./protos/polygonx";
 import SampleSaver from "./utils/sample-saver";
+import POGOProtos from "@na-ji/pogo-protos";
 
 // try looking if config file exists...
 let config = require("./config/example.config.json");
@@ -223,18 +223,18 @@ const httpServer = http.createServer(function (req, res) {
                     }
 
                     // Decode the RawProtoCollection from binary protobuf
-                    const decoded = RawProtoCollection.decode(binaryData) as unknown as RawProtoCollectionMessage;
+                    const decoded = POGOProtos.Rpc.AllTypesAndMessagesResponsesProto.Hexagon.RawProtoCollectionMessage.decode(binaryData);
 
                     // Process RawProto entries (have both request and response)
                     if (decoded.protos && Array.isArray(decoded.protos)) {
                         for (const rawProto of decoded.protos) {
-                            const identifier = rawProto.trainerId || "unknown";
-                            const method = rawProto.method;
+                            const identifier = rawProto.trainer_id || "unknown";
+                            const method = rawProto.method?.valueOf() || 0;
                             const requestBytes = rawProto.request;
                             const responseBytes = rawProto.proto;
 
                             // Decode request
-                            if (requestBytes && requestBytes.length > 0) {
+                            if (requestBytes && requestBytes.length > 0 && method !== 0) {
                                 const parsedRequestData = decodeProtoFromBytes(method, requestBytes, "request");
                                 if (typeof parsedRequestData !== "string") {
                                     parsedRequestData.identifier = identifier;
@@ -265,10 +265,10 @@ const httpServer = http.createServer(function (req, res) {
                     }
 
                     // Process RawPushGatewayProto entries (response only)
-                    if (decoded.pushGatewayProtos && Array.isArray(decoded.pushGatewayProtos)) {
-                        for (const pushProto of decoded.pushGatewayProtos) {
-                            const identifier = pushProto.trainerId || "unknown";
-                            const method = pushProto.method;
+                    if (decoded.push_gateway_protos && Array.isArray(decoded.push_gateway_protos)) {
+                        for (const pushProto of decoded.push_gateway_protos) {
+                            const identifier = pushProto.trainer_id || "unknown";
+                            const method = pushProto.method?.valueOf() || 0;
                             const responseBytes = pushProto.proto;
 
                             // Decode response

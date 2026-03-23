@@ -18,6 +18,7 @@ Response Route: /raw
 Web Interface to View Protos: /
 Traffic Route mode /traffic
 Golbat Route mode /golbat
+PolyX Route mode /PolygonX/PostProtos
 
 
 Web Interface: 
@@ -78,6 +79,33 @@ interface CombinedMessage {
             request: string
             payload: string
             have_ar?: boolean
+        }
+    ]
+}
+```
+
+### Support for PolygonX interfaces
+**Sent to** `/PolygonX/PostProtos`
+
+```js
+interface CombinedMessage {
+    protos: [
+        {
+            method: number
+            proto: bytes
+            request: bytes
+            trainer_id: string
+            trainer_level: number
+            has_geotargeted_ar_scan_quest: boolean
+        }
+    ]
+    push_gateway_protos: [
+        {
+            method: number
+            proto: bytes
+            trainer_id: string
+            trainer_level: number
+            has_geotargeted_ar_scan_quest: boolean
         }
     ]
 }
