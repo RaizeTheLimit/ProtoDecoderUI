@@ -89,7 +89,7 @@ interface CombinedMessage {
 
 ```js
 interface CombinedMessage {
-    protos: RawProto[
+    protos: [
         {
             method: number
             proto: bytes
@@ -99,7 +99,7 @@ interface CombinedMessage {
             has_geotargeted_ar_scan_quest: boolean
         }
     ]
-    push_gateway_protos: RawPushGatewayProto[
+    push_gateway_protos: [
         {
             method: number
             proto: bytes
