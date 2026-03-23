@@ -141,6 +141,14 @@ yarn build
 yarn start
 ```
 
+### Support Python Protobuf Decoding altarnatively
+```bash
+cd python 
+pip install -r requirements.txt
+python main.py
+```
+
+Supports Decoding Requests and Response Messages
 ## Credits
 
  - [--=FurtiF™=-](https://github.com/sponsors/Furtif) for putting in the hard work of supplying Protos with every release ❤️

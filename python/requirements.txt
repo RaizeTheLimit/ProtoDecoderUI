@@ -1,0 +1,25 @@
+# ProtoDecoder Python Desktop Application Requirements
+# Python 3.10+ required
+
+# Core dependencies (built-in modules not listed)
+# - tkinter (GUI) - built-in
+# - http.server (HTTP endpoints) - built-in  
+# - json (configuration) - built-in
+# - logging (logging) - built-in
+# - threading (concurrency) - built-in
+# - pathlib (file paths) - built-in
+
+# Protocol buffer processing
+# Note: Using existing protos/ folder - no additional protobuf dependencies needed
+
+# Geographic coordinate processing
+# Using built-in math module for Haversine and shoelace formulas
+
+# Development dependencies (optional)
+# pytest>=7.0.0
+# black>=22.0.0
+# flake8>=5.0.0
+# mypy>=1.0.0
+
+# Note: This application is designed to use only Python standard library
+# to maintain zero web framework dependencies and minimal external dependencies
