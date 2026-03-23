@@ -15,9 +15,9 @@
     wrap-ansi-cjs "npm:wrap-ansi@^7.0.0"
 
 "@na-ji/pogo-protos@^2.131.0":
-  version "2.227.0"
-  resolved "https://registry.yarnpkg.com/@na-ji/pogo-protos/-/pogo-protos-2.227.0.tgz#b06c5499f44633a9eb1c7935737781587f4d38d9"
-  integrity sha512-bWRe/+ULd+nGmX0+1twzu7xEw/5HXC55us1Rw1h060rwUsX2KpTqLxO0Kjlotnq1v5+vPvvp+EeO6+3y+qe3Fg==
+  version "2.228.0"
+  resolved "https://registry.yarnpkg.com/@na-ji/pogo-protos/-/pogo-protos-2.228.0.tgz#82977b9c9160c6d78222cfb7a007c6b99d3be240"
+  integrity sha512-Irtm7TiOFx5HONjdliP/hAleVOCtmKSPFF2e/wqX86mdHXSJwWTKDyAo8fTfS7LDshV5ozdH5t48oyrWNZPwSQ==
   dependencies:
     protobufjs "^6.11.4"
 
@@ -564,9 +564,9 @@ socket.io-adapter@~2.5.2:
     ws "~8.18.3"
 
 socket.io-parser@~4.2.4:
-  version "4.2.5"
-  resolved "https://registry.yarnpkg.com/socket.io-parser/-/socket.io-parser-4.2.5.tgz#3f41b8d369129a93268f2abecba94b5292850099"
-  integrity sha512-bPMmpy/5WWKHea5Y/jYAP6k74A+hvmRCQaJuJB6I/ML5JZq/KfNieUVo/3Mh7SAqn7TyFdIo6wqYHInG1MU1bQ==
+  version "4.2.6"
+  resolved "https://registry.yarnpkg.com/socket.io-parser/-/socket.io-parser-4.2.6.tgz#19156bf179af3931abd05260cfb1491822578a6f"
+  integrity sha512-asJqbVBDsBCJx0pTqw3WfesSY0iRX+2xzWEWzrpcH7L6fLzrhyF8WPI8UaeM4YCuDfpwA/cgsdugMsmtz8EJeg==
   dependencies:
     "@socket.io/component-emitter" "~3.1.0"
     debug "~4.4.1"
