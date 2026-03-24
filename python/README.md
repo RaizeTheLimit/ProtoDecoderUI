@@ -107,13 +107,25 @@ Process golbat protocol buffer data
 ### /PolygonX/PostProtos (POST)
 Process polygon protocol buffer data with geographic calculations
 ```json
-{
-  "polygon_data": {
-    "coordinates": [
-      {"latitude": 37.7749, "longitude": -122.4194},
-      {"latitude": 37.7849, "longitude": -122.4094}
+    protos: [
+        {
+            method: number
+            proto: bytes
+            request: bytes
+            trainer_id: string
+            trainer_level: number
+            has_geotargeted_ar_scan_quest: boolean
+        }
     ]
-  }
+    push_gateway_protos: [
+        {
+            method: number
+            proto: bytes
+            trainer_id: string
+            trainer_level: number
+            has_geotargeted_ar_scan_quest: boolean
+        }
+    ]
 }
 ```
 
