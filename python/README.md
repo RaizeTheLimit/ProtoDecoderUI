@@ -1,4 +1,6 @@
-# ProtoDecoder Python Desktop Application
+# ProtoDecoderUI Python Desktop Application
+
+## This project need fixed and completed, it is currently a work in progress.
 
 Complete migration of JavaScript ProtoDecoderWebUI to Python 3.10+ desktop application using Tkinter for GUI, maintaining 100% functional equivalence of `/traffic`, `/golbat`, and `/PolygonX/PostProtos` endpoints while eliminating all web-based dependencies.
 
