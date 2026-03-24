@@ -84,23 +84,35 @@ Configuration is managed through:
 
 ### /traffic (POST)
 Process traffic protocol buffer data
-```json
-{
-  "protos": [
-    {
-      "method": 101,
-      "request": "base64_encoded_protobuf",
-      "response": "base64_encoded_protobuf"
-    }
-  ]
+```js
+interface CombinedMessage {
+    rpcid?: number
+    rpcstatus?: number
+    rpchandle?: number
+    protos: [
+        {
+            method: number
+            request: string
+            response: string
+        }
+    ]
 }
 ```
 
 ### /golbat (POST)
 Process golbat protocol buffer data
-```json
-{
-  "data": "flexible_golbat_data_structure"
+```js
+interface CombinedMessage {
+    username: string 
+    trainerlvl?: number
+    contents : [
+        {
+            type: number
+            request: string
+            payload: string
+            have_ar?: boolean
+        }
+    ]
 }
 ```
 
