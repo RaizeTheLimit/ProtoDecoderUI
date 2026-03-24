@@ -107,6 +107,7 @@ Process golbat protocol buffer data
 ### /PolygonX/PostProtos (POST)
 Process polygon protocol buffer data with geographic calculations
 ```json
+{
     protos: [
         {
             method: number
