@@ -187,31 +187,6 @@ protos/                  # Existing protobuf definitions
 
 ## Testing
 
-### Integration Testing
-Run integration tests to verify all components:
-```bash
-python python/utils/integration_test.py
-```
-
-### Performance Testing
-Monitor performance through the GUI or programmatically:
-```python
-from python.utils.performance_monitor import PerformanceMonitor
-
-monitor = PerformanceMonitor()
-monitor.start_monitoring()
-# ... run application ...
-summary = monitor.get_performance_summary()
-```
-
-## Error Recovery
-
-The application implements comprehensive error recovery:
-- **Exponential Backoff**: Automatic retry with increasing delays
-- **Graceful Degradation**: Continue operation with reduced functionality
-- **Error Categorization**: Different recovery strategies for different error types
-- **User Notifications**: Clear error messages and recovery status
-
 ## Theme Management
 
 ### Available Themes
