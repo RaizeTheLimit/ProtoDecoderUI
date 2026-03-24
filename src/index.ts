@@ -229,7 +229,8 @@ const httpServer = http.createServer(function (req, res) {
                     if (decoded.protos && Array.isArray(decoded.protos)) {
                         for (const rawProto of decoded.protos) {
                             const identifier = rawProto.trainer_id || "unknown";
-                            const method = rawProto.method?.valueOf() || 0;
+                            // const level = rawProto.trainer_level || 0;
+                            const method = rawProto.method!;
                             const requestBytes = rawProto.request;
                             const responseBytes = rawProto.proto;
 
@@ -268,11 +269,12 @@ const httpServer = http.createServer(function (req, res) {
                     if (decoded.push_gateway_protos && Array.isArray(decoded.push_gateway_protos)) {
                         for (const pushProto of decoded.push_gateway_protos) {
                             const identifier = pushProto.trainer_id || "unknown";
-                            const method = pushProto.method?.valueOf() || 0;
+                            // const level = pushProto.trainer_level || 0;
+                            const method = pushProto.method!;
                             const responseBytes = pushProto.proto;
 
                             // Decode response
-                            if (responseBytes && responseBytes.length > 0) {
+                            if (responseBytes && responseBytes.length > 0 && method !== 0) {
                                 const parsedResponseData = decodeProtoFromBytes(method, responseBytes, "response");
                                 if (typeof parsedResponseData !== "string") {
                                     parsedResponseData.identifier = identifier;
