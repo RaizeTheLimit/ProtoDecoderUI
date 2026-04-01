@@ -231,3 +231,211 @@ table tr td.important {
 		padding: 5px 10px !important;
 	}
 }
+
+/* ================================
+   DARK MODE - JSON VIEWER COMPLETE RESTYLE
+   ================================ */
+
+/* Main containers */
+.dark .method-data-incoming,
+.dark .method-data-outgoing {
+	background-color: #0f0f1e !important;
+	color: #f5f5f5 !important;
+	border: 1px solid #333 !important;
+	border-radius: 4px !important;
+	padding: 12px !important;
+}
+
+.dark pre {
+	background-color: #0f0f1e !important;
+	color: #f5f5f5 !important;
+	border: 1px solid #333 !important;
+}
+
+/* JSON Viewer Container */
+.dark .jv-container {
+	background-color: #0f0f1e !important;
+	color: #f5f5f5 !important;
+}
+
+/* Reset all child elements */
+.dark .jv-container,
+.dark .jv-container * {
+	background-color: transparent !important;
+}
+
+/* Element text */
+.dark .jv-element {
+	color: #f5f5f5 !important;
+}
+
+/* Keys (property names) - Cyan */
+.dark .jv-key {
+	color: #56d4dd !important;
+	font-weight: 600 !important;
+}
+
+/* String values - Green */
+.dark .jv-string {
+	color: #81c784 !important;
+}
+
+/* Number values - Orange/Yellow */
+.dark .jv-number {
+	color: #ffb74d !important;
+}
+
+/* Boolean values - Pink/Red */
+.dark .jv-boolean {
+	color: #ff6b7a !important;
+	font-weight: 600 !important;
+}
+
+/* Null values - Gray */
+.dark .jv-null {
+	color: #9e9e9e !important;
+	font-style: italic !important;
+}
+
+/* Object and Array brackets */
+.dark .jv-object,
+.dark .jv-array {
+	color: #f5f5f5 !important;
+}
+
+/* Punctuation (colons, commas, brackets) */
+.dark .jv-collon,
+.dark .jv-comma {
+	color: #bdbdbd !important;
+}
+
+/* Collapsed/Expandable objects */
+.dark .jv-button {
+	background-color: transparent !important;
+	color: #56d4dd !important;
+	border: 1px solid #56d4dd !important;
+	cursor: pointer !important;
+}
+
+.dark .jv-button:hover {
+	background-color: rgba(86, 212, 221, 0.2) !important;
+}
+
+/* Indent guides */
+.dark .jv-indent {
+	background-color: transparent !important;
+}
+
+/* Property value pairs */
+.dark .jv-element-label {
+	color: #b0bec5 !important;
+}
+
+/* Expandable items count */
+.dark .jv-count {
+	color: #81c784 !important;
+	font-style: italic !important;
+}
+
+/* Error messages */
+.dark .jv-error {
+	color: #ff6b7a !important;
+	background-color: rgba(255, 107, 122, 0.1) !important;
+}
+
+/* ================================
+   FORCE OVERRIDE - INLINE STYLES
+   ================================ */
+
+/* Override ALL colors in dark mode JSON viewer */
+.dark .method-data-incoming *,
+.dark .method-data-outgoing * {
+	color: inherit !important;
+	background-color: transparent !important;
+}
+
+/* Force all spans inside jv-container to not be blue */
+.dark .jv-container span {
+	color: inherit;
+}
+
+/* Brute force - override every text element */
+.dark .jv-container span,
+.dark .jv-container b,
+.dark .jv-container strong,
+.dark .jv-container em,
+.dark .jv-container i {
+	color: #f5f5f5 !important;
+	background: transparent !important;
+}
+
+/* Specific styling for each type using class selectors */
+.dark span.jv-boolean {
+	color: #ff6b7a !important;
+	font-weight: 600 !important;
+}
+
+.dark span.jv-key {
+	color: #56d4dd !important;
+}
+
+.dark span.jv-string {
+	color: #81c784 !important;
+}
+
+.dark span.jv-number {
+	color: #ffb74d !important;
+}
+
+.dark span.jv-null {
+	color: #9e9e9e !important;
+}
+
+/* Override inline color styles with attribute selectors */
+.dark [style*="color: rgb"],
+.dark [style*="color:#"],
+.dark [style*="color: #"] {
+	color: #faf4f4 !important;
+}
+
+/* Specific override for blue values that might appear */
+.dark [style*="2196F3"],
+.dark [style*="0066cc"] {
+	color: #ff6b7a !important;
+}
+
+/* Modal dark mode text */
+.dark .modal-body pre,
+.dark .modal-body .jv-container {
+	background-color: #0f0f1e !important;
+	color: #f5f5f5 !important;
+}
+
+.dark .modal-body {
+	background-color: var(--background-color) !important;
+	color: var(--black-color) !important;
+}
+
+.dark .modal-body pre {
+	background-color: #0f0f1e !important;
+	color: #f5f5f5 !important;
+}
+
+.dark .modal-body pre * {
+	color: inherit !important;
+	background: transparent !important;
+}
+
+/* Modal content dark mode */
+.dark .modal-content {
+	background-color: var(--background-color) !important;
+	border: 1px solid rgba(255, 255, 255, 0.2) !important;
+}
+
+.dark .modal-header {
+	border-bottom: 1px solid rgba(255, 255, 255, 0.2) !important;
+}
+
+.dark .modal-footer {
+	border-top: 1px solid rgba(255, 255, 255, 0.2) !important;
+}
