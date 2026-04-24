@@ -430,6 +430,8 @@ export const requestMessagesResponses = {
 	REQUEST_TYPE_METHOD_GET_TIME_TRAVEL_INFORMATION: [3076, POGOProtos.Rpc.GetTimeTravelInformationProto, POGOProtos.Rpc.GetTimeTravelInformationOutProto],
 	REQUEST_TYPE_METHOD_DAY_NIGHT_POI_ENCOUNTER: [3077, POGOProtos.Rpc.DayNightPoiEncounterProto, POGOProtos.Rpc.DayNightPoiEncounterOutProto],
 	REQUEST_TYPE_METHOD_MARK_FIELDBOOK_SEEN: [3078, POGOProtos.Rpc.MarkFieldbookSeenRequestProto, POGOProtos.Rpc.MarkFieldbookSeenResponseProto],
+	REQUEST_TYPE_METHOD_MEGA_LEVEL_UP: [3079, POGOProtos.Rpc.MegaLevelUpProto, POGOProtos.Rpc.MegaLevelUpOutProto],
+	REQUEST_TYPE_METHOD_GET_MEGA_LEVEL_UP_PREVIEW: [3080, POGOProtos.Rpc.GetMegaLevelUpPreviewProto, POGOProtos.Rpc.GetMegaLevelUpPreviewOutProto],
 	REQUEST_TYPE_PLATFORM_REGISTER_PUSH_NOTIFICATION: [5000, POGOProtos.Rpc.PushNotificationRegistryProto, POGOProtos.Rpc.PushNotificationRegistryOutProto],
 	REQUEST_TYPE_PLATFORM_UNREGISTER_PUSH_NOTIFICATION: [5001, null, null],
 	REQUEST_TYPE_PLATFORM_UPDATE_NOTIFICATION_STATUS: [5002, POGOProtos.Rpc.UpdateNotificationProto, POGOProtos.Rpc.UpdateNotificationOutProto],
