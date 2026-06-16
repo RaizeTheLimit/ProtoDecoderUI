@@ -138,7 +138,7 @@ export const decodeProto = (method: number, data: string, dataType: string): Dec
                         data: {
                             error: "Failed to decode proto",
                             rawBase64: data,
-                            errorMessage: error.toString()
+                            errorMessage: (error as Error).toString()
                         },
                     };
                 }
@@ -180,7 +180,7 @@ export const decodeProto = (method: number, data: string, dataType: string): Dec
                         data: {
                             error: "Failed to decode proto",
                             rawBase64: data,
-                            errorMessage: error.toString()
+                            errorMessage: (error as Error).toString()
                         },
                     };
                 }
@@ -262,7 +262,7 @@ export const decodeProtoFromBytes = (method: number, data: Uint8Array, dataType:
                         methodName: remasterOrCleanMethodString(foundMethodString) + " [PARSE ERROR]",
                         data: {
                             error: "Failed to decode proto",
-                            errorMessage: error.toString()
+                            errorMessage: (error as Error).toString()
                         },
                     };
                 }
@@ -302,7 +302,7 @@ export const decodeProtoFromBytes = (method: number, data: Uint8Array, dataType:
                         methodName: remasterOrCleanMethodString(foundMethodString) + " [PARSE ERROR]",
                         data: {
                             error: "Failed to decode proto",
-                            errorMessage: error.toString()
+                            errorMessage: (error as Error).toString()
                         },
                     };
                 }
