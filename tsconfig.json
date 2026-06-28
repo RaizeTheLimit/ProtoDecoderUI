@@ -7,7 +7,7 @@
     "skipLibCheck": true,
     "sourceMap": true,
     "outDir": "./dist",
-    "rootDir": ".",
+    "rootDir": "./src",
     "moduleResolution": "nodenext",
     "removeComments": true,
     "noImplicitAny": false,
