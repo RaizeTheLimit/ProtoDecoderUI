@@ -1,9 +1,8 @@
 services:
   protodecoder-ui:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: ghcr.io/raizethelimit/protodecoderui:latest
     container_name: protodecoder-ui
+    restart: unless-stopped
     ports:
       - "8081:8081"
     volumes:
