@@ -8,7 +8,6 @@ services:
     volumes:
       - ./src/config/config.json:/app/dist/config/config.json:ro
       - ./proto_samples:/app/proto_samples
-    restart: unless-stopped
     environment:
       - NODE_ENV=production
     healthcheck:
