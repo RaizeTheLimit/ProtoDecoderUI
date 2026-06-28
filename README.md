@@ -141,6 +141,59 @@ yarn build
 yarn start
 ```
 
+### Docker Usage
+
+ProtoDecoderUI is available as a Docker image on GitHub Container Registry.
+
+#### Quick start with Docker Compose
+
+```bash
+# Clone the repository
+git clone git@github.com:RaizeTheLimit/ProtoDecoderUI.git
+cd ./ProtoDecoderUI
+
+# Copy and adjust the config file (required)
+cp src/config/example.config.json src/config/config.json
+
+# Start the container
+docker compose up -d
+```
+
+The UI will be available at `http://localhost:8081`.
+
+#### Using docker run directly
+
+```bash
+# Create a config directory and copy your config
+mkdir -p config proto_samples
+cp src/config/example.config.json config/config.json
+# Edit config/config.json to your needs
+
+# Run the container
+docker run -d \
+  --name protodecoder-ui \
+  -p 8081:8081 \
+  -v "$(pwd)/config/config.json:/app/dist/config/config.json:ro" \
+  -v "$(pwd)/proto_samples:/app/proto_samples" \
+  --restart unless-stopped \
+  ghcr.io/raizethelimit/protodecoderui:latest
+```
+
+#### Build the image locally
+
+```bash
+docker build -t protodecoder-ui .
+docker run -d \
+  --name protodecoder-ui \
+  -p 8081:8081 \
+  -v "$(pwd)/src/config/config.json:/app/dist/config/config.json:ro" \
+  -v "$(pwd)/proto_samples:/app/proto_samples" \
+  --restart unless-stopped \
+  protodecoder-ui
+```
+
+**Important:** You must provide a valid `config.json` file mounted at `/app/dist/config/config.json`. The container will not start without it. The `proto_samples` volume is optional but recommended for storing captured proto samples.
+
 ### Support Python Protobuf Decoding altarnatively
 ```bash
 cd python 
