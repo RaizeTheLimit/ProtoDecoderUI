@@ -27,7 +27,7 @@
     "typescript": "^5.9.3"
   },
   "dependencies": {
-    "@na-ji/pogo-protos": "^2.249.0",
+    "@na-ji/pogo-protos": "^2.257.0",
     "jquery.json-viewer": "^1.5.0",
     "socket.io": "^4.8.3"
   }
